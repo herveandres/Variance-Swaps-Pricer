@@ -14,22 +14,22 @@ public:
     virtual HestonVariancePathSimulator* clone() const = 0;
 };
 
-class TruncatedGaussian : public HestonVariancePathSimulator
+class TruncatedGaussianScheme : public HestonVariancePathSimulator
 {
 private:
     /* data */
 public:
-    TruncatedGaussian(const HestonModel& hestonModel);
-    TruncatedGaussian* clone() const;
+    TruncatedGaussianScheme(const HestonModel& hestonModel);
+    TruncatedGaussianScheme* clone() const;
 };
 
-class QuadraticExponential : public HestonVariancePathSimulator
+class QuadraticExponentialScheme : public HestonVariancePathSimulator
 {
 private:
     /* data */
 public:
-    QuadraticExponential(const HestonModel& hestonModel);
-    QuadraticExponential* clone() const;
+    QuadraticExponentialScheme(const HestonModel& hestonModel);
+    QuadraticExponentialScheme* clone() const;
 };
 
 #endif 

@@ -11,24 +11,24 @@ HestonVariancePathSimulator::~HestonVariancePathSimulator()
     
 }
 
-TruncatedGaussian::TruncatedGaussian(const HestonModel& hestonModel):
+TruncatedGaussianScheme::TruncatedGaussianScheme(const HestonModel& hestonModel):
                         HestonVariancePathSimulator(hestonModel)
 {
 
 }
 
-QuadraticExponential::QuadraticExponential(const HestonModel& hestonModel):
+QuadraticExponentialScheme::QuadraticExponentialScheme(const HestonModel& hestonModel):
                         HestonVariancePathSimulator(hestonModel)
 {
 
 }
 
-TruncatedGaussian* TruncatedGaussian::clone() const
+TruncatedGaussianScheme* TruncatedGaussianScheme::clone() const
 {
-    return new TruncatedGaussian(*this);
+    return new TruncatedGaussianScheme(*this);
 }
 
-QuadraticExponential* QuadraticExponential::clone() const
+QuadraticExponentialScheme* QuadraticExponentialScheme::clone() const
 {
-    return new QuadraticExponential(*this);
+    return new QuadraticExponentialScheme(*this);
 }
