@@ -3,7 +3,7 @@
 
 #include "PathSimulator.h"
 #include "HestonVariancePathSimulator.h"
-
+//c'est galère d'écrire des commentaires en c++, non pas du tout
 class HestonLogSpotPathSimulator : public PathSimulator
 {
 protected:
