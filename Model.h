@@ -6,9 +6,7 @@ class Model
 private:
     /* data */
 public:
-    Model(/* args */);
-    virtual ~Model();
-    virtual Model* clone() const = 0;
+
 };
 
 
@@ -30,7 +28,9 @@ public:
                 double correlation,
                 double initialVolatility,
                 double initialAssetValue);
-    HestonModel* clone() const;
+    HestonModel(const HestonModel& hestonModel);
+    double getInitialVolatility() const;
+    double getInitialAssetValue() const;
 };
 
 #endif // !MODEL_H

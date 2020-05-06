@@ -6,10 +6,13 @@
 
 class HestonVariancePathSimulator : public PathSimulator
 {
-private:
-    /* data */
+protected:
+    const HestonModel* hestonModel_;
+
+    virtual double nextStep(std::size_t currentIndex, double currentValue) const = 0;
 public:
-    HestonVariancePathSimulator(const HestonModel& hestonModel);
+    HestonVariancePathSimulator(const std::vector<double>& timePoints,
+                                const HestonModel& hestonModel);
     virtual ~HestonVariancePathSimulator();
     virtual HestonVariancePathSimulator* clone() const = 0;
 };
@@ -17,18 +20,22 @@ public:
 class TruncatedGaussianScheme : public HestonVariancePathSimulator
 {
 private:
-    /* data */
+    double nextStep(std::size_t currentIndex, double currentValue) const;
 public:
-    TruncatedGaussianScheme(const HestonModel& hestonModel);
+    TruncatedGaussianScheme(const std::vector<double>& timePoints,
+                            const HestonModel& hestonModel);
+    TruncatedGaussianScheme(const TruncatedGaussianScheme& truncatedGaussianScheme);
     TruncatedGaussianScheme* clone() const;
 };
 
 class QuadraticExponentialScheme : public HestonVariancePathSimulator
 {
 private:
-    /* data */
+    double nextStep(std::size_t currentIndex, double currentValue) const;
 public:
-    QuadraticExponentialScheme(const HestonModel& hestonModel);
+    QuadraticExponentialScheme(const std::vector<double>& timePoints,
+                                const HestonModel& hestonModel);
+    QuadraticExponentialScheme(const QuadraticExponentialScheme& quadraticExponentialScheme);
     QuadraticExponentialScheme* clone() const;
 };
 

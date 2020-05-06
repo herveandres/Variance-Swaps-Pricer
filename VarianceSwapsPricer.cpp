@@ -1,23 +1,19 @@
 #include "VarianceSwapsPricer.h"
 
 
-VarianceSwapsPricer::VarianceSwapsPricer(const Model& model): model_(model.clone())
-{
-
-}
 
 VarianceSwapsPricer::~VarianceSwapsPricer()
 {
-    delete model_;
+
 }
 
 VarianceSwapsHestonPricer::VarianceSwapsHestonPricer(const HestonModel& hestonModel):
-                                       VarianceSwapsPricer(hestonModel)
+                                        hestonModel_(new HestonModel(hestonModel))
 {
     
 }
 
 VarianceSwapsHestonPricer::~VarianceSwapsHestonPricer()
 {
-
+    delete hestonModel_;
 }

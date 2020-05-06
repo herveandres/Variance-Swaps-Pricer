@@ -1,12 +1,5 @@
 #include "Model.h"
 
-Model::Model(){
-
-}
-Model::~Model(){
-    
-}
-
 HestonModel::HestonModel(double drift,
                         double meanReversionSpeed,
                         double meanReversionLevel,
@@ -26,6 +19,22 @@ HestonModel::HestonModel(double drift,
     
 }
 
-HestonModel* HestonModel::clone() const{
-    return new HestonModel(*this);
+HestonModel::HestonModel(const HestonModel& hestonModel):
+    drift_(hestonModel.drift_), meanReversionSpeed_(hestonModel.meanReversionSpeed_),
+    meanReversionLevel_(hestonModel.meanReversionLevel_), 
+    volOfVol_(hestonModel.volOfVol_), correlation_(hestonModel.correlation_),
+    initialVolatility_(hestonModel.initialVolatility_), 
+    initialAssetValue_(hestonModel.initialAssetValue_)
+{
+
+}
+
+double HestonModel::getInitialVolatility() const
+{
+    return initialVolatility_;
+}
+
+double HestonModel::getInitialAssetValue() const
+{
+    return initialAssetValue_;
 }

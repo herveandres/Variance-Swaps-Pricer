@@ -9,7 +9,8 @@ class VarianceSwapsHestonMonteCarloPricer : public VarianceSwapsHestonPricer
 private:
     HestonLogSpotPathSimulator* hestonPathSimulator_;
 public:
-    VarianceSwapsHestonMonteCarloPricer(const HestonModel& HestonModel);
+    VarianceSwapsHestonMonteCarloPricer(const HestonModel& hestonModel,
+                                        const HestonLogSpotPathSimulator& hestonPathSimulator);
     ~VarianceSwapsHestonMonteCarloPricer();
     double price(const VarianceSwap& varianceSwap) const override;
 };

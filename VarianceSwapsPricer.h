@@ -7,9 +7,8 @@
 class VarianceSwapsPricer
 {
 protected:
-    const Model* model_;
+
 public:
-    VarianceSwapsPricer(const Model& model); 
     virtual ~VarianceSwapsPricer();
     virtual double price(const VarianceSwap& varianceSwap) const = 0;
 };
@@ -17,7 +16,7 @@ public:
 class VarianceSwapsHestonPricer : public VarianceSwapsPricer
 {
 protected:
-
+    const HestonModel* hestonModel_;
 public:
     VarianceSwapsHestonPricer(const HestonModel& hestonModel);
     virtual ~VarianceSwapsHestonPricer();

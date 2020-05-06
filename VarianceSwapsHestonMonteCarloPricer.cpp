@@ -1,8 +1,9 @@
 #include "VarianceSwapsHestonMonteCarloPricer.h"
 
-VarianceSwapsHestonMonteCarloPricer::VarianceSwapsHestonMonteCarloPricer(
-                                            const HestonModel& hestonModel):
-                                    VarianceSwapsHestonPricer(hestonModel)
+VarianceSwapsHestonMonteCarloPricer::VarianceSwapsHestonMonteCarloPricer
+                                (const HestonModel& hestonModel,
+                                const HestonLogSpotPathSimulator& hestonPathSimulator):
+            VarianceSwapsHestonPricer(hestonModel), hestonPathSimulator_(hestonPathSimulator.clone())
 {
 
 }
