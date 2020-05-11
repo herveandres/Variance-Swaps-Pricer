@@ -1,5 +1,10 @@
 #include <cmath>
+#include <complex>
 #include <functional>
+#include <vector>
+
+using namespace std;
+
 
 namespace MathFunctions
 {
@@ -22,7 +27,13 @@ namespace MathFunctions
            x -= fx/fPrime(x);
            fx = f(x);
        }
+       std::complex<double> j;
        return x;      
+    }
+
+    std::complex<double> differencesFinies(std::function<std::complex<double>(double,double)> f, double omega, double tau, double epsilon=pow(10,-3))
+    {
+        return (f(tau,omega+epsilon)-f(tau,omega-epsilon))/(2*epsilon);
     }
 
     //Function looking for the index i s.t. list[i] <= x < list[i+1] (list is sorted)
