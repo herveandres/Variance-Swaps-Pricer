@@ -29,6 +29,31 @@ HestonModel::HestonModel(const HestonModel& hestonModel):
 
 }
 
+double HestonModel::getDrift() const
+{
+    return drift_;
+}
+
+double HestonModel::getMeanReversionSpeed() const
+{
+    return meanReversionSpeed_;
+}
+
+double HestonModel::getMeanReversionLevel() const
+{
+    return meanReversionLevel_;
+}
+
+double HestonModel::getVolOfVol() const
+{
+    return volOfVol_;
+}
+
+double HestonModel::getCorrelation() const
+{
+    return correlation_;
+}
+
 double HestonModel::getInitialVolatility() const
 {
     return initialVolatility_;

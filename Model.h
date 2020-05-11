@@ -29,6 +29,11 @@ public:
                 double initialVolatility,
                 double initialAssetValue);
     HestonModel(const HestonModel& hestonModel);
+    double getDrift() const;
+    double getMeanReversionSpeed() const;
+    double getMeanReversionLevel() const;
+    double getVolOfVol() const;
+    double getCorrelation() const;
     double getInitialVolatility() const;
     double getInitialAssetValue() const;
 };
