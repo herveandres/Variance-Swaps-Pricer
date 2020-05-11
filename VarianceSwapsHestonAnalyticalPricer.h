@@ -11,11 +11,11 @@ private:
 public:
     VarianceSwapsHestonAnalyticalPricer(const HestonModel& hestonModel);
     ~VarianceSwapsHestonAnalyticalPricer();
-    complex<double> a_term (const double omega) const ;
-    complex<double> b_term (const double omega) const ;
-    complex<double> g_term (const double omega) const ;
-    complex<double> Function_C (const double tau, const double omega) const;
-    complex<double> Function_D (const double tau, const double omega) const;
+    complex<double> aTerm (const double omega) const ;
+    complex<double> bTerm (const double omega) const ;
+    complex<double> gTerm (const double omega) const ;
+    complex<double> FunctionC (const double tau, const double omega) const;
+    complex<double> FunctionD (const double tau, const double omega) const;
     double price(const VarianceSwap& varianceSwap) const override;
 };
 
