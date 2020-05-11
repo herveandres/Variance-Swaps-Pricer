@@ -26,16 +26,23 @@ private:
     double nextStep(std::size_t currentIndex, double currentValue) const;
     static double h(double r, double psi);
     static double hPrime(double r, double psi); 
-
+    
     const double confidenceMultiplier_;
     std::vector<double> k1_;
     std::vector<double> k2_;
     std::vector<double> k3_;
     std::vector<double> k4_;
+    std::vector<double> psiGrid_;
+    double initialGuess_;
+    std::vector<double> fmu_;
+    std::vector<double> fsigma_;
 
 public:
     TruncatedGaussianScheme(const std::vector<double>& timePoints,
-                            const HestonModel& hestonModel, double confidenceMultiplier = 4);
+                            const HestonModel& hestonModel, 
+                            double confidenceMultiplier = 4,
+                            std::size_t psiGridSize = 100,
+                            double initialGuess = 1);
     //Copy constructor
     TruncatedGaussianScheme(const TruncatedGaussianScheme& truncatedGaussianScheme);
     TruncatedGaussianScheme* clone() const;
