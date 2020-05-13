@@ -1,7 +1,6 @@
-#include "VarianceSwapsHestonAnalyticalPricer.h"
 #include <complex>
+#include "VarianceSwapsHestonAnalyticalPricer.h"
 #include "MathFunctions.h"
-using namespace MathFunctions;
 
 VarianceSwapsHestonAnalyticalPricer::VarianceSwapsHestonAnalyticalPricer(
                                             const HestonModel& hestonModel):
@@ -39,7 +38,7 @@ FunctionC(double tau, double omega) const {
 }
 
 complex<double> VarianceSwapsHestonAnalyticalPricer::
-static FunctionD(double tau, double omega) const {
+FunctionD(double tau, double omega) const {
     complex<double> D_init;
     D_init=(aTerm(omega)-bTerm(omega))/(hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol());
     return D_init*(aTerm(omega)+bTerm(omega))*(1.-exp(-bTerm(omega)*tau))/(1.-gTerm(omega)*exp(-bTerm(omega)*tau));
@@ -47,7 +46,7 @@ static FunctionD(double tau, double omega) const {
 
 complex<double> VarianceSwapsHestonAnalyticalPricer::
 FunctionDPrime(double tau, double omega) const {
-    return differencesFinies(FunctionD,omega,tau);
+    // return MathFunctions::differencesFinies(FunctionD,omega,tau);
 }
 
 double VarianceSwapsHestonAnalyticalPricer::price(const VarianceSwap& varianceSwap) const{

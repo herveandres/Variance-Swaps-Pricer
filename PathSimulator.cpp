@@ -1,6 +1,7 @@
 #include "PathSimulator.h"
 
- PathSimulator::PathSimulator(double initialValue, const std::vector<double>& timePoints):
+ PathSimulator::PathSimulator(double initialValue, 
+ 							  const std::vector<double>& timePoints):
     initialValue_(initialValue), timePoints_(timePoints)
  {
 

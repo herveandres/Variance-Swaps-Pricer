@@ -1,5 +1,6 @@
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 #include "HestonVariancePathSimulator.h"
 #include "MathFunctions.h"
 
@@ -69,11 +70,11 @@ void TruncatedGaussianScheme::preComputations()
     //Pre-computation of f_mu and f_sigma
     double min = 1.0/(confidenceMultiplier_*confidenceMultiplier_);
     double max = eps*eps/(2*kappa*theta);
-    delta = (max-min)/double(psiGrid_.size()-1);
+    psiGrid_ = MathFunctions::buildLinearSpace(min,max,psiGrid_.size());
     double r, psi, phi, Phi;
     for(std::size_t i = 0; i < psiGrid_.size(); i++)
     {
-        psiGrid_[i] = min+i*delta; psi = psiGrid_[i];
+        psi = psiGrid_[i];
         r = MathFunctions::newtonMethod(initialGuess_,
                                         [psi](double r){return h(r,psi);},
                                         [psi](double r){return hPrime(r,psi);});
@@ -106,7 +107,8 @@ double TruncatedGaussianScheme::nextStep(std::size_t currentIndex, double curren
         mu = fmu*m;
         sigma = fsigma*sqrt(s2);
     }
-    
+    double z = MathFunctions::simulateGaussianRandomVariable();
+    return std::max(mu+sigma*z,0.0);
 }   
 
 double TruncatedGaussianScheme::h(double r, double psi)

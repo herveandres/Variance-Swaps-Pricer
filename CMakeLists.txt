@@ -15,4 +15,5 @@ add_executable(VarianceSwapsPricer
                 VarianceSwap.cpp VarianceSwap.h
                 VarianceSwapsPricer.cpp VarianceSwapsPricer.h
                 VarianceSwapsHestonAnalyticalPricer.cpp VarianceSwapsHestonAnalyticalPricer.h 
-                VarianceSwapsHestonMonteCarloPricer.cpp VarianceSwapsHestonMonteCarloPricer.h) 
+                VarianceSwapsHestonMonteCarloPricer.cpp VarianceSwapsHestonMonteCarloPricer.h
+                MathFunctions.cpp MathFunctions.h) 
