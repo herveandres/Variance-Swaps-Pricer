@@ -62,7 +62,7 @@ private:
 
 public:
     QuadraticExponentialScheme(const std::vector<double>& timePoints,
-                                const HestonModel& hestonModel, const double critical_psi = 0.5);
+                                const HestonModel& hestonModel, double critical_psi = 0.5);
     //Copy constructor
     QuadraticExponentialScheme(const QuadraticExponentialScheme& quadraticExponentialScheme);
     QuadraticExponentialScheme* clone() const;
