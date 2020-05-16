@@ -193,8 +193,3 @@ QuadraticExponentialScheme* QuadraticExponentialScheme::clone() const
 {
     return new QuadraticExponentialScheme(*this);
 }
-
-double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double currentValue) const
-{
-    //A compléter
-}
