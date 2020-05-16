@@ -8,8 +8,14 @@ class HestonVariancePathSimulator : public PathSimulator
 {
 protected:
     const HestonModel* hestonModel_;
-
+    /* Function that pre-computes some quantities that will be used in nextStep and caches them 
+    NB : we allow the time grid to be non-equidistant so that the computed quantities are time dependent.*/
+    void preComputations();
     virtual double nextStep(std::size_t currentIndex, double currentValue) const = 0;
+    std::vector<double> k1_;
+    std::vector<double> k2_;
+    std::vector<double> k3_;
+    std::vector<double> k4_;
 public:
     HestonVariancePathSimulator(const std::vector<double>& timePoints,
                                 const HestonModel& hestonModel);
@@ -20,18 +26,14 @@ public:
 class TruncatedGaussianScheme : public HestonVariancePathSimulator
 {
 private:
-    /* Function that pre-computes some quantities that will be used in nextStep and caches them 
-    NB : we allow the time grid to be non-equidistant so that the computed quantities are time dependent.*/
-    void preComputations();
+    //Pre-computation of f_mu and f_sigma
+    void preComputationsTG();
     double nextStep(std::size_t currentIndex, double currentValue) const;
     static double h(double r, double psi);
     static double hPrime(double r, double psi); 
     
     const double confidenceMultiplier_;
-    std::vector<double> k1_;
-    std::vector<double> k2_;
-    std::vector<double> k3_;
-    std::vector<double> k4_;
+
     std::vector<double> psiGrid_;
     double initialGuess_;
     std::vector<double> fmu_;
@@ -57,7 +59,6 @@ private:
     std::vector<double> k4_;
     double psiC_;
     double kStar_;
-    void preComputations();
     double nextStep(std::size_t currentIndex, double currentValue) const;
 
 public:

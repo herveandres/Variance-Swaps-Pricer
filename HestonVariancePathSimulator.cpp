@@ -11,7 +11,7 @@ HestonVariancePathSimulator::HestonVariancePathSimulator(
                                           timePoints),
                             hestonModel_(new HestonModel(hestonModel))
 {
-
+    preComputations();
 }
 
 HestonVariancePathSimulator::~HestonVariancePathSimulator()
@@ -19,35 +19,7 @@ HestonVariancePathSimulator::~HestonVariancePathSimulator()
     delete hestonModel_;
 }
 
-TruncatedGaussianScheme::TruncatedGaussianScheme(const std::vector<double>& timePoints,
-                                                const HestonModel& hestonModel, 
-                                                double confidenceMultiplier,
-                                                std::size_t psiGridSize,
-                                                double initialGuess):
-                        HestonVariancePathSimulator(timePoints,hestonModel), 
-                        confidenceMultiplier_(confidenceMultiplier),
-                        psiGrid_(std::vector<double>(psiGridSize)),
-                        initialGuess_(initialGuess)
-{
-    preComputations();
-}
-
-TruncatedGaussianScheme::TruncatedGaussianScheme(const TruncatedGaussianScheme& truncatedGaussianScheme):
-                    HestonVariancePathSimulator(truncatedGaussianScheme.timePoints_,
-                                            *truncatedGaussianScheme.hestonModel_),
-                    confidenceMultiplier_(truncatedGaussianScheme.confidenceMultiplier_),
-                    psiGrid_(truncatedGaussianScheme.psiGrid_),
-                    initialGuess_(truncatedGaussianScheme.initialGuess_)
-{
-    preComputations();
-}
-
-TruncatedGaussianScheme* TruncatedGaussianScheme::clone() const
-{
-    return new TruncatedGaussianScheme(*this);
-}
-
-void TruncatedGaussianScheme::preComputations()
+void HestonVariancePathSimulator::preComputations()
 {
     double theta = hestonModel_->getMeanReversionLevel();
     double kappa = hestonModel_->getMeanReversionSpeed();
@@ -65,9 +37,42 @@ void TruncatedGaussianScheme::preComputations()
         k3_.push_back(eps*eps*expMinusKappaDelta*(1-expMinusKappaDelta)/kappa);
         k4_.push_back(theta*eps*eps*(1-expMinusKappaDelta)*(1-expMinusKappaDelta)/(2*kappa));
     }
+}
 
+TruncatedGaussianScheme::TruncatedGaussianScheme(const std::vector<double>& timePoints,
+                                                const HestonModel& hestonModel, 
+                                                double confidenceMultiplier,
+                                                std::size_t psiGridSize,
+                                                double initialGuess):
+                        HestonVariancePathSimulator(timePoints,hestonModel), 
+                        confidenceMultiplier_(confidenceMultiplier),
+                        psiGrid_(std::vector<double>(psiGridSize)),
+                        initialGuess_(initialGuess)
+{
+    preComputationsTG();
+}
 
-    //Pre-computation of f_mu and f_sigma
+TruncatedGaussianScheme::TruncatedGaussianScheme(const TruncatedGaussianScheme& truncatedGaussianScheme):
+                    HestonVariancePathSimulator(truncatedGaussianScheme.timePoints_,
+                                            *truncatedGaussianScheme.hestonModel_),
+                    confidenceMultiplier_(truncatedGaussianScheme.confidenceMultiplier_),
+                    psiGrid_(truncatedGaussianScheme.psiGrid_),
+                    initialGuess_(truncatedGaussianScheme.initialGuess_)
+{
+    preComputationsTG();
+}
+
+TruncatedGaussianScheme* TruncatedGaussianScheme::clone() const
+{
+    return new TruncatedGaussianScheme(*this);
+}
+
+void TruncatedGaussianScheme::preComputationsTG()
+{
+    double theta = hestonModel_->getMeanReversionLevel();
+    double kappa = hestonModel_->getMeanReversionSpeed();
+    double eps = hestonModel_->getVolOfVol();
+
     double min = 1.0/(confidenceMultiplier_*confidenceMultiplier_);
     double max = eps*eps/(2*kappa*theta);
     psiGrid_ = MathFunctions::buildLinearSpace(min,max,psiGrid_.size());
@@ -134,26 +139,6 @@ QuadraticExponentialScheme::QuadraticExponentialScheme(const std::vector<double>
 {
 
 
-}
-
-void QuadraticExponentialScheme::preComputations()
-{
-    double theta = hestonModel_->getMeanReversionLevel();
-    double kappa = hestonModel_->getMeanReversionSpeed();
-    double eps = hestonModel_->getVolOfVol();
-    double delta;
-    double expMinusKappaDelta;
-
-    //Pre-computation of k1, k2, k3, k4 s.t. m = k1 V + k2 and s² = k3 V + k4
-    for(std::size_t i = 0; i < timePoints_.size()-1; i++)
-    {
-        delta = timePoints_[i+1] - timePoints_[i];
-        expMinusKappaDelta = exp(-kappa*delta);
-        k1_.push_back(expMinusKappaDelta);
-        k2_.push_back(theta*(1-expMinusKappaDelta));
-        k3_.push_back(eps*eps*expMinusKappaDelta*(1-expMinusKappaDelta)/kappa);
-        k4_.push_back(theta*eps*eps*(1-expMinusKappaDelta)*(1-expMinusKappaDelta)/(2*kappa));
-    }
 }
 
 double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double currentValue) const{
