@@ -127,11 +127,57 @@ double TruncatedGaussianScheme::hPrime(double r, double psi)
     return 2*phi+2*r*Phi-2*(1+psi)*Phi*(phi+r*Phi);
 }
 
+
 QuadraticExponentialScheme::QuadraticExponentialScheme(const std::vector<double>& timePoints,
                                                     const HestonModel& hestonModel):
                         HestonVariancePathSimulator(timePoints,hestonModel)
 {
 
+
+}
+
+void QuadraticExponentialScheme::preComputations()
+{
+    double theta = hestonModel_->getMeanReversionLevel();
+    double kappa = hestonModel_->getMeanReversionSpeed();
+    double eps = hestonModel_->getVolOfVol();
+    double delta;
+    double expMinusKappaDelta;
+
+    //Pre-computation of k1, k2, k3, k4 s.t. m = k1 V + k2 and s² = k3 V + k4
+    for(std::size_t i = 0; i < timePoints_.size()-1; i++)
+    {
+        delta = timePoints_[i+1] - timePoints_[i];
+        expMinusKappaDelta = exp(-kappa*delta);
+        k1_.push_back(expMinusKappaDelta);
+        k2_.push_back(theta*(1-expMinusKappaDelta));
+        k3_.push_back(eps*eps*expMinusKappaDelta*(1-expMinusKappaDelta)/kappa);
+        k4_.push_back(theta*eps*eps*(1-expMinusKappaDelta)*(1-expMinusKappaDelta)/(2*kappa));
+    }
+}
+
+double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double currentValue) const{
+    double m = k1_[currentIndex]*currentValue + k2_[currentIndex];
+    double s2 = k3_[currentIndex]*currentValue + k4_[currentIndex];
+    double psi = s2/(m*m);
+    double p = (psi-1.)/(psi+1.);
+    double U = MathFunctions::simulateGaussianRandomVariable();
+    if (psi<0.5){
+        double temp_value = 2/psi;
+        double b = sqrt(temp_value - 1. + sqrt(temp_value*(temp_value-1.)));
+        double a = m/(1+b*b);
+        double Zv = MathFunctions::normalCDF(U);
+        return a*(b+Zv)*(b+Zv);
+    }
+    else {
+        if (U<p){
+            return 0.;
+        }
+        else{
+            double beta = (1-p)/m;
+            return log((1-p)/(1-U))/beta;
+        }
+    }
 }
 
 QuadraticExponentialScheme::QuadraticExponentialScheme(const QuadraticExponentialScheme&
@@ -141,6 +187,7 @@ QuadraticExponentialScheme::QuadraticExponentialScheme(const QuadraticExponentia
 {
 
 }
+
 
 QuadraticExponentialScheme* QuadraticExponentialScheme::clone() const
 {
