@@ -129,7 +129,7 @@ double TruncatedGaussianScheme::hPrime(double r, double psi)
 
 
 QuadraticExponentialScheme::QuadraticExponentialScheme(const std::vector<double>& timePoints,
-                                                    const HestonModel& hestonModel):
+                                                    const HestonModel& hestonModel, const double critical_psi = 0.5):
                         HestonVariancePathSimulator(timePoints,hestonModel)
 {
 
@@ -162,7 +162,7 @@ double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double cur
     double psi = s2/(m*m);
     double p = (psi-1.)/(psi+1.);
     double U = MathFunctions::simulateGaussianRandomVariable();
-    if (psi<0.5){
+    if (psi<critical_psi){
         double temp_value = 2/psi;
         double b = sqrt(temp_value - 1. + sqrt(temp_value*(temp_value-1.)));
         double a = m/(1+b*b);
