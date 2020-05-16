@@ -46,7 +46,10 @@ FunctionD(double tau, double omega) const {
 
 complex<double> VarianceSwapsHestonAnalyticalPricer::
 FunctionDPrime(double tau, double omega) const {
-    // return MathFunctions::differencesFinies(FunctionD,omega,tau);
+    std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
+        return this->FunctionD(tau,omega);
+    };
+    return MathFunctions::differencesFinies(f,omega,tau);
 }
 
 double VarianceSwapsHestonAnalyticalPricer::price(const VarianceSwap& varianceSwap) const{
