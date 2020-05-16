@@ -130,7 +130,7 @@ double TruncatedGaussianScheme::hPrime(double r, double psi)
 
 QuadraticExponentialScheme::QuadraticExponentialScheme(const std::vector<double>& timePoints,
                                                     const HestonModel& hestonModel, const double critical_psi):
-                        HestonVariancePathSimulator(timePoints,hestonModel), critical_psi_(critical_psi)
+                        HestonVariancePathSimulator(timePoints,hestonModel), psiC_(psiC)
 {
 
 

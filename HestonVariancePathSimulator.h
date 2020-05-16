@@ -55,14 +55,14 @@ private:
     std::vector<double> k2_;
     std::vector<double> k3_;
     std::vector<double> k4_;
-    double critical_psi_; 
-
+    double psiC_;
+    double kStar_;
     void preComputations();
     double nextStep(std::size_t currentIndex, double currentValue) const;
 
 public:
     QuadraticExponentialScheme(const std::vector<double>& timePoints,
-                                const HestonModel& hestonModel, double critical_psi = 0.5);
+                                const HestonModel& hestonModel, double psiC = 0.5);
     //Copy constructor
     QuadraticExponentialScheme(const QuadraticExponentialScheme& quadraticExponentialScheme);
     QuadraticExponentialScheme* clone() const;
