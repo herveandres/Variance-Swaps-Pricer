@@ -31,23 +31,52 @@ gTerm(double omega) const {
     return (aTerm(omega)-bTerm(omega))/(aTerm(omega)+bTerm(omega));
 }
 
+double VarianceSwapsHestonAnalyticalPricer::
+qtilde() const {
+    return (2*hestonModel_->getMeanReversionSpeed()/(hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()));
+}
+
 complex<double> VarianceSwapsHestonAnalyticalPricer::
-FunctionC(double tau, double omega) const {
+functionC(double tau, double omega) const {
     complex<double> j(0.,1.);
     return tau * hestonModel_->getDrift() * (j * omega - 1.)+ hestonModel_->getMeanReversionSpeed() *  hestonModel_->getMeanReversionLevel() / (hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()) * ((aTerm(omega)-bTerm(omega))*tau-2.*log((1.-gTerm(omega)*exp(-bTerm(omega)*tau))/(1.-gTerm(omega)))) ;
 }
 
 complex<double> VarianceSwapsHestonAnalyticalPricer::
-FunctionD(double tau, double omega) const {
+functionD(double tau, double omega) const {
     complex<double> D_init;
     D_init=(aTerm(omega)-bTerm(omega))/(hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol());
     return D_init*(aTerm(omega)+bTerm(omega))*(1.-exp(-bTerm(omega)*tau))/(1.-gTerm(omega)*exp(-bTerm(omega)*tau));
 }
 
 complex<double> VarianceSwapsHestonAnalyticalPricer::
-FunctionDPrime(double tau, double omega) const {
+functionDPrime(double tau, double omega) const {
     std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
-        return this->FunctionD(tau,omega);
+        return this->functionD(tau,omega);
+    };
+    return MathFunctions::differencesFinies(f,omega,tau);
+}
+
+complex<double> VarianceSwapsHestonAnalyticalPricer::
+functionCPrime(double tau, double omega) const {
+    std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
+        return this->functionC(tau,omega);
+    };
+    return MathFunctions::differencesFinies(f,omega,tau);
+}
+
+complex<double> VarianceSwapsHestonAnalyticalPricer::
+functionCSecond(double tau, double omega) const {
+    std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
+        return this->functionCPrime(tau,omega);
+    };
+    return MathFunctions::differencesFinies(f,omega,tau);
+}
+
+complex<double> VarianceSwapsHestonAnalyticalPricer::
+functionDSecond(double tau, double omega) const {
+    std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
+        return this->functionDPrime(tau,omega);
     };
     return MathFunctions::differencesFinies(f,omega,tau);
 }

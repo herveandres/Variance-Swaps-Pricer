@@ -14,9 +14,13 @@ public:
     complex<double> aTerm (double omega) const ;
     complex<double> bTerm (double omega) const ;
     complex<double> gTerm (double omega) const ;
-    complex<double> FunctionC (double tau, double omega) const;
-    complex<double> FunctionD (double tau, double omega) const;
-    complex<double> FunctionDPrime (double tau, double omega) const;
+    double qtilde () const;
+    complex<double> functionC (double tau, double omega) const;
+    complex<double> functionD (double tau, double omega) const;
+    complex<double> functionDPrime (double tau, double omega) const;
+    complex<double> functionCPrime (double tau, double omega) const;
+    complex<double> functionDSecond (double tau, double omega) const;
+    complex<double> functionCSecond (double tau, double omega) const;
     double price(const VarianceSwap& varianceSwap) const override;
 };
 
