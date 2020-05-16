@@ -55,6 +55,7 @@ private:
     std::vector<double> k2_;
     std::vector<double> k3_;
     std::vector<double> k4_;
+    double critical_psi_; 
 
     void preComputations();
     double nextStep(std::size_t currentIndex, double currentValue) const;
