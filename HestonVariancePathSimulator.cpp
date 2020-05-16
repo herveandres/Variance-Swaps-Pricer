@@ -5,11 +5,11 @@
 #include "MathFunctions.h"
 
 HestonVariancePathSimulator::HestonVariancePathSimulator(
-                                        const std::vector<double>& timePoints,
-                                        const HestonModel& hestonModel):
-                            PathSimulator(hestonModel.getInitialVolatility(),
-                                          timePoints),
-                            hestonModel_(new HestonModel(hestonModel))
+        const std::vector<double>& timePoints,
+        const HestonModel& hestonModel):
+    PathSimulator(hestonModel.getInitialVolatility(),
+                  timePoints),
+    hestonModel_(new HestonModel(hestonModel))
 {
     preComputations();
 }
@@ -40,24 +40,24 @@ void HestonVariancePathSimulator::preComputations()
 }
 
 TruncatedGaussianScheme::TruncatedGaussianScheme(const std::vector<double>& timePoints,
-                                                const HestonModel& hestonModel, 
-                                                double confidenceMultiplier,
-                                                std::size_t psiGridSize,
-                                                double initialGuess):
-                        HestonVariancePathSimulator(timePoints,hestonModel), 
-                        confidenceMultiplier_(confidenceMultiplier),
-                        psiGrid_(std::vector<double>(psiGridSize)),
-                        initialGuess_(initialGuess)
+                                                 const HestonModel& hestonModel,
+                                                 double confidenceMultiplier,
+                                                 std::size_t psiGridSize,
+                                                 double initialGuess):
+    HestonVariancePathSimulator(timePoints,hestonModel),
+    confidenceMultiplier_(confidenceMultiplier),
+    psiGrid_(std::vector<double>(psiGridSize)),
+    initialGuess_(initialGuess)
 {
     preComputationsTG();
 }
 
 TruncatedGaussianScheme::TruncatedGaussianScheme(const TruncatedGaussianScheme& truncatedGaussianScheme):
-                    HestonVariancePathSimulator(truncatedGaussianScheme.timePoints_,
-                                            *truncatedGaussianScheme.hestonModel_),
-                    confidenceMultiplier_(truncatedGaussianScheme.confidenceMultiplier_),
-                    psiGrid_(truncatedGaussianScheme.psiGrid_),
-                    initialGuess_(truncatedGaussianScheme.initialGuess_)
+    HestonVariancePathSimulator(truncatedGaussianScheme.timePoints_,
+                                *truncatedGaussianScheme.hestonModel_),
+    confidenceMultiplier_(truncatedGaussianScheme.confidenceMultiplier_),
+    psiGrid_(truncatedGaussianScheme.psiGrid_),
+    initialGuess_(truncatedGaussianScheme.initialGuess_)
 {
     preComputationsTG();
 }
@@ -82,7 +82,7 @@ void TruncatedGaussianScheme::preComputationsTG()
         psi = psiGrid_[i];
         r = MathFunctions::newtonMethod(initialGuess_,
                                         [psi](double r){return h(r,psi);},
-                                        [psi](double r){return hPrime(r,psi);});
+        [psi](double r){return hPrime(r,psi);});
         phi = MathFunctions::normalPDF(r);
         Phi = MathFunctions::normalCDF(r);
         fmu_.push_back(r/(phi+r*Phi));
@@ -134,10 +134,10 @@ double TruncatedGaussianScheme::hPrime(double r, double psi)
 
 
 QuadraticExponentialScheme::QuadraticExponentialScheme(const std::vector<double>& timePoints,
-                                                    const HestonModel& hestonModel, double psiC):
-                        HestonVariancePathSimulator(timePoints,hestonModel), psiC_(psiC)
+                                                       const HestonModel& hestonModel, double psiC):
+    HestonVariancePathSimulator(timePoints,hestonModel), psiC_(psiC)
 {
-
+    preComputations();
 
 }
 
@@ -146,12 +146,12 @@ double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double cur
     double s2 = k3_[currentIndex]*currentValue + k4_[currentIndex];
     double psi = s2/(m*m);
     double p = (psi-1.)/(psi+1.);
-    double U = MathFunctions::simulateGaussianRandomVariable();
+    double U = MathFunctions::simulateUniformRandomVariable();
     if (psi<psiC_){
         double temp_value = 2/psi;
         double b = sqrt(temp_value - 1. + sqrt(temp_value*(temp_value-1.)));
         double a = m/(1+b*b);
-        double Zv = MathFunctions::normalCDF(U);
+        double Zv = MathFunctions::normalCDFInverse(U);
         return a*(b+Zv)*(b+Zv);
     }
     else {
@@ -166,11 +166,11 @@ double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double cur
 }
 
 QuadraticExponentialScheme::QuadraticExponentialScheme(const QuadraticExponentialScheme&
-                                                        quadraticExponentialScheme):
-                        HestonVariancePathSimulator(quadraticExponentialScheme.timePoints_,
-                                                *quadraticExponentialScheme.hestonModel_)
+                                                       quadraticExponentialScheme):
+    HestonVariancePathSimulator(quadraticExponentialScheme.timePoints_,
+                                *quadraticExponentialScheme.hestonModel_)
 {
-
+    preComputations();
 }
 
 

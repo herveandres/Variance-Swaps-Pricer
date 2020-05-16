@@ -53,10 +53,6 @@ public:
 class QuadraticExponentialScheme : public HestonVariancePathSimulator
 {
 private:
-    std::vector<double> k1_;
-    std::vector<double> k2_;
-    std::vector<double> k3_;
-    std::vector<double> k4_;
     double psiC_;
     double kStar_;
     double nextStep(std::size_t currentIndex, double currentValue) const;
