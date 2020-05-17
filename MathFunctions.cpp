@@ -68,8 +68,7 @@ double simulateUniformRandomVariable()
 }
 double simulateGaussianRandomVariable()
 {
-    std::uniform_real_distribution<double> distribution(0.,1.);
-    double u = distribution(generator), v = distribution(generator);
+    double u = simulateUniformRandomVariable(), v = simulateUniformRandomVariable();
     return std::sqrt(-2*std::log(u))*std::sin(2*M_PI*v);
 }
 

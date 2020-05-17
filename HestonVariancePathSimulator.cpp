@@ -144,17 +144,17 @@ double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double cur
     double m = k1_[currentIndex]*currentValue + k2_[currentIndex];
     double s2 = k3_[currentIndex]*currentValue + k4_[currentIndex];
     double psi = s2/(m*m);
-    double p = (psi-1.)/(psi+1.);
     double U = MathFunctions::simulateUniformRandomVariable();
     if (psi<psiC_){
-        double temp_value = 2/psi;
+        double temp_value = 2./psi;
         double b = sqrt(temp_value - 1. + sqrt(temp_value*(temp_value-1.)));
         double a = m/(1+b*b);
         double Zv = MathFunctions::normalCDFInverse(U);
         return a*(b+Zv)*(b+Zv);
     }
     else {
-        if (U<p){
+        double p = (psi-1.)/(psi+1.);
+        if (U<=p){
             return 0.;
         }
         else{
