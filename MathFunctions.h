@@ -14,9 +14,12 @@ namespace MathFunctions
 
     double normalCDF(double x);
 
+    double normalCDFInverse(double x);
+
     extern unsigned seed;
     extern std::default_random_engine generator;
 
+    double simulateUniformRandomVariable();
     //Simulate a standard Gaussian variable using Box-Muller method
     double simulateGaussianRandomVariable();
 
