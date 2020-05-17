@@ -63,10 +63,10 @@ void DiscretizationScheme::preComputations()
     }
 }
 
-void DiscretizationScheme::setGamma(double gamma1, double gamma2){
-    gamma1_ = gamma1;
-    gamma2_ = gamma2;
-}
+// void DiscretizationScheme::setGamma(double gamma1, double gamma2){
+//     gamma1_ = gamma1;
+//     gamma2_ = gamma2;
+// }
 
 DiscretizationScheme::DiscretizationScheme(const DiscretizationScheme& broadieKayaScheme):
         HestonLogSpotPathSimulator(broadieKayaScheme.timePoints_,

@@ -20,3 +20,8 @@ std::vector<double> PathSimulator::path() const
 
 	return path;
 }
+
+std::vector<double> PathSimulator::getTimePoints() const
+{
+	return timePoints_;
+}

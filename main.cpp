@@ -10,7 +10,7 @@ int main()
     
     HestonModel hestonModel(0,0.5,0.04,1.0,-0.9,0.04,100);
     double maturity = 1;
-    vector<double> timePoints = MathFunctions::buildLinearSpace(0,maturity,10);
+    vector<double> timePoints = MathFunctions::buildLinearSpace(0,maturity,1000);
     TruncatedGaussianScheme truncatedGaussianScheme(timePoints,hestonModel);
 
     std::vector<double> pathTruncatedGaussian = truncatedGaussianScheme.path();

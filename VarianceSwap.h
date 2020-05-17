@@ -3,17 +3,14 @@
 
 #include <vector>
 
-using namespace std;
-
 class VarianceSwap
 {
 private:
-    double maturity_;
-    size_t nbOfObservations_;
-    vector<double> dates_;
+    std::vector<double> dates_;
 public:
-    VarianceSwap(double maturity, size_t nbOfObservations);
+    VarianceSwap(double maturity, std::size_t nbOfObservations);
     ~VarianceSwap();
+    std::vector<double> getDates() const;
 };
 
 #endif

@@ -1,11 +1,12 @@
 #include "VarianceSwap.h"
+#include "MathFunctions.h"
 
-VarianceSwap::VarianceSwap(double maturity, size_t nbOfObservations) 
-    : maturity_(maturity), nbOfObservations_(nbOfObservations)
+VarianceSwap::VarianceSwap(double maturity, std::size_t nbOfObservations) 
 {
-    double delta_t = maturity/nbOfObservations;
-    for(size_t i = 0; i <= nbOfObservations; i++)
-    {
-        dates_.push_back(i*delta_t);
-    }
+    dates_ = MathFunctions::buildLinearSpace(0,maturity,nbOfObservations);
+}
+
+std::vector<double> VarianceSwap::getDates() const
+{
+    return dates_;
 }

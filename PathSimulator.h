@@ -16,6 +16,7 @@ public:
     virtual ~PathSimulator();
     virtual PathSimulator* clone() const = 0;
     std::vector<double> path() const; 
+    std::vector<double> getTimePoints() const;
 };
 
 #endif // !
