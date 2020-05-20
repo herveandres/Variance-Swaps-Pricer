@@ -12,15 +12,6 @@ PathSimulator::~PathSimulator()
 
 }
 
-std::vector<double> PathSimulator::path() const
-{
-	std::vector<double> path {initialValue_};
-	for (std::size_t index = 0; index < timePoints_.size() - 1; ++index)
-		path.push_back(nextStep(index, path[index]));
-
-	return path;
-}
-
 std::vector<double> PathSimulator::getTimePoints() const
 {
 	return timePoints_;

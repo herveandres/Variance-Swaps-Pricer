@@ -21,6 +21,7 @@ public:
                                 const HestonModel& hestonModel);
     virtual ~HestonVariancePathSimulator();
     virtual HestonVariancePathSimulator* clone() const = 0;
+    std::vector<double> path() const;
 };
 
 class TruncatedGaussianScheme : public HestonVariancePathSimulator

@@ -9,31 +9,19 @@ class HestonLogSpotPathSimulator : public PathSimulator
 protected:
     const HestonModel* hestonModel_;
     const HestonVariancePathSimulator* variancePathSimulator_;
-
-    virtual double nextStep(std::size_t currentIndex, double currentValue) const = 0;
+    virtual double nextStep(std::size_t currentIndex, double currentValue, const std::vector<double>& variancePath) const = 0;
 public:
     HestonLogSpotPathSimulator(const std::vector<double>& timePoints,
                                const HestonModel& hestonModel,
                                const HestonVariancePathSimulator& variancePathSimulator);
     virtual ~HestonLogSpotPathSimulator();
     virtual HestonLogSpotPathSimulator* clone() const =0;
+    std::vector<double> path() const;
 };
 
 class BroadieKayaScheme : public HestonLogSpotPathSimulator{
 private:
-    double nextStep(std::size_t currentIndex, double currentValue) const;
-public:
-    BroadieKayaScheme(const std::vector<double>& timePoints,
-                      const HestonModel& hestonModel,
-                      const HestonVariancePathSimulator& variancePathSimulator);
-    BroadieKayaScheme(const BroadieKayaScheme& broadieKayaScheme);
-    BroadieKayaScheme* clone() const;
-};
-
-class DiscretizationScheme : public HestonLogSpotPathSimulator
-{
-private:
-    double nextStep(std::size_t currentIndex, double currentValue) const;
+    double nextStep(std::size_t currentIndex, double currentValue, const std::vector<double>& variancePath) const;
     double gamma1_;
     double gamma2_;
 
@@ -44,12 +32,15 @@ private:
     std::vector<double>  k4_;
     void preComputations();
 public:
-    DiscretizationScheme(const std::vector<double>& timePoints,
+    BroadieKayaScheme(const std::vector<double>& timePoints,
                          const HestonModel& hestonModel,
-                         const HestonVariancePathSimulator& variancePathSimulator);
-    DiscretizationScheme(const DiscretizationScheme& discretizationScheme);
-    DiscretizationScheme* clone() const;
+                         const HestonVariancePathSimulator& variancePathSimulator,
+                         double gamma1 = 0.5,
+                         double gamma2 = 0.5);
+    BroadieKayaScheme(const BroadieKayaScheme& broadieKayaScheme);
+    BroadieKayaScheme* clone() const;
 };
+
 
 /* Optional */
 

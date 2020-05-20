@@ -7,6 +7,8 @@
 #include <functional>
 #include <vector>
 #include <random>
+#include <iostream>
+
 
 namespace MathFunctions
 {

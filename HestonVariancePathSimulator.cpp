@@ -39,6 +39,15 @@ void HestonVariancePathSimulator::preComputations()
     }
 }
 
+std::vector<double> HestonVariancePathSimulator::path() const
+{
+    std::vector<double> path {initialValue_};
+	for (std::size_t index = 0; index < timePoints_.size() - 1; ++index)
+		path.push_back(nextStep(index, path[index]));
+
+	return path;
+}
+
 TruncatedGaussianScheme::TruncatedGaussianScheme(const std::vector<double>& timePoints,
                                                  const HestonModel& hestonModel,
                                                  double confidenceMultiplier,
@@ -57,9 +66,10 @@ TruncatedGaussianScheme::TruncatedGaussianScheme(const TruncatedGaussianScheme& 
                                 *truncatedGaussianScheme.hestonModel_),
     confidenceMultiplier_(truncatedGaussianScheme.confidenceMultiplier_),
     psiGrid_(truncatedGaussianScheme.psiGrid_),
-    initialGuess_(truncatedGaussianScheme.initialGuess_)
+    initialGuess_(truncatedGaussianScheme.initialGuess_),
+    fmu_(truncatedGaussianScheme.fmu_), fsigma_(truncatedGaussianScheme.fsigma_)
 {
-    preComputationsTG();
+    
 }
 
 TruncatedGaussianScheme* TruncatedGaussianScheme::clone() const
@@ -82,7 +92,7 @@ void TruncatedGaussianScheme::preComputationsTG()
         psi = psiGrid_[i];
         r = MathFunctions::newtonMethod(initialGuess_,
                                         [psi](double r){return h(r,psi);},
-        [psi](double r){return hPrime(r,psi);});
+                                        [psi](double r){return hPrime(r,psi);});
         phi = MathFunctions::normalPDF(r);
         Phi = MathFunctions::normalCDF(r);
         fmu_.push_back(r/(phi+r*Phi));
@@ -167,7 +177,8 @@ double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double cur
 QuadraticExponentialScheme::QuadraticExponentialScheme(const QuadraticExponentialScheme&
                                                        quadraticExponentialScheme):
     HestonVariancePathSimulator(quadraticExponentialScheme.timePoints_,
-                                *quadraticExponentialScheme.hestonModel_)
+                                *quadraticExponentialScheme.hestonModel_),
+    psiC_(quadraticExponentialScheme.psiC_)
 {
     
 }

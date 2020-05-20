@@ -1,4 +1,5 @@
 #include "VarianceSwapsHestonMonteCarloPricer.h"
+#include <iostream>
 
 VarianceSwapsHestonMonteCarloPricer::VarianceSwapsHestonMonteCarloPricer
                                 (const HestonModel& hestonModel,
@@ -21,7 +22,7 @@ double VarianceSwapsHestonMonteCarloPricer::pathPrice(std::vector<double> path,
     double pathPrice = 0.0; 
     for(size_t i = 0; i < path.size()-1; i++)
     {   
-        pathPrice += std::pow(std::log(path[i+1]/path[i]),2); 
+        pathPrice += std::pow(path[i+1]-path[i],2); 
     }
     return 100*100*pathPrice/maturity;
 }
@@ -31,17 +32,14 @@ double VarianceSwapsHestonMonteCarloPricer::price(const VarianceSwap& varianceSw
     double price = 0.;
     std::vector<double> dates = varianceSwap.getDates();
     std::vector<double> simulationTimeSteps = hestonPathSimulator_->getTimePoints();
-    std::vector<double> indexes{0};
 
     //We look for the indexes of the simulated path corresponding to the dates 
     //of the variance swaps
-    for(size_t i = 1, j = 1; i < simulationTimeSteps.size(); i++)
+    std::vector<double> indexes;
+    std::size_t nbSimulationsBetweenDates = (simulationTimeSteps.size()-1)/(dates.size()-1);
+    for(size_t i = 0; i < dates.size(); i++)
     {
-        if(abs(dates[j]-simulationTimeSteps[i]) <= std::pow(10,-8))
-        {
-            indexes.push_back(i); 
-            j++;
-        }
+        indexes.push_back((nbSimulationsBetweenDates-1)*i);
     }
     double maturity = dates.back();
     std::vector<double> simulatedPath;
@@ -56,6 +54,7 @@ double VarianceSwapsHestonMonteCarloPricer::price(const VarianceSwap& varianceSw
             pathForPricing.push_back(simulatedPath[indexes[i]]);
         }
 		price += pathPrice(pathForPricing, maturity);
+        pathForPricing.clear();
 	}
 	price /= nbSimulations_;
 	return price;
