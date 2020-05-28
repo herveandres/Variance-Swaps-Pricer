@@ -4,6 +4,7 @@
 #include "VarianceSwap.h"
 #include "MathFunctions.h"
 #include "VarianceSwapsHestonMonteCarloPricer.h"
+#include "VarianceSwapsHestonAnalyticalPricer.h"
 
 int main()
 {
@@ -30,6 +31,10 @@ int main()
         if(i == dates.size()-2)
             timePoints.push_back(temp.back());
     }
+    std::cout << "Analytical computation of the price" << std::endl;
+    VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
+    std::cout << anPricer.price(varianceSwap) << std::endl;
+
     std::cout << "Computation of the price using TG + BroadieKaya" << std::endl;
     TruncatedGaussianScheme truncatedGaussianScheme(timePoints,hestonModel);
     BroadieKayaScheme broadieKayaSchemeTG(timePoints,hestonModel,truncatedGaussianScheme);
