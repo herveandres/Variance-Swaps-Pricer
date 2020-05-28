@@ -81,7 +81,6 @@ namespace MathFunctions
             x -= fx/fPrime(x);
             fx = f(x);
         }
-        std::complex<double> j;
         return x;
     }
 
