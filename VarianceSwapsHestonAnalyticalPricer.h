@@ -23,7 +23,7 @@ public:
     double qtilde () const;
     double cTerm (size_t i, const VarianceSwap& varianceSwap) const;
     double wTerm (size_t i, const VarianceSwap& varianceSwap) const;
-    double u_0Term (const VarianceSwap& varianceSwap) const;
+    double u_1Term (const VarianceSwap& varianceSwap) const;
     double u_iTerm (size_t i, const VarianceSwap& varianceSwap) const;
     double price(const VarianceSwap& varianceSwap) const override;
 };

@@ -9,7 +9,7 @@
 int main()
 {
     //Heston model parameters
-    double drift = 0, kappa = 0.5, theta = 0.04, eps = 1.0, rho = -0.9,
+    double drift = 0, kappa = 0.5, theta = 0.04, eps = 0.5, rho = -0.9,
             V0 = 0.04, X0 = 100;
 
     HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
@@ -33,7 +33,8 @@ int main()
     }
     std::cout << "Analytical computation of the price" << std::endl;
     VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
-    std::cout << anPricer.price(varianceSwap) << std::endl;
+    std::cout << anPricer.price(varianceSwap) << std::endl << std::endl;
+
 
     std::cout << "Computation of the price using TG + BroadieKaya" << std::endl;
     TruncatedGaussianScheme truncatedGaussianScheme(timePoints,hestonModel);
