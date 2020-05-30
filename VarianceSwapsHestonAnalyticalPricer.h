@@ -7,10 +7,6 @@
 class VarianceSwapsHestonAnalyticalPricer : public VarianceSwapsHestonPricer
 {
 private:
-
-public:
-    VarianceSwapsHestonAnalyticalPricer(const HestonModel& hestonModel);
-    ~VarianceSwapsHestonAnalyticalPricer();
     std::complex<double> aTerm (double omega) const ;
     std::complex<double> bTerm (double omega) const ;
     std::complex<double> gTerm (double omega) const ;
@@ -20,11 +16,14 @@ public:
     std::complex<double> functionCPrime (double tau, double omega) const;
     std::complex<double> functionDSecond (double tau, double omega) const;
     std::complex<double> functionCSecond (double tau, double omega) const;
-    double qtilde () const;
-    double cTerm (size_t i, const VarianceSwap& varianceSwap) const;
-    double wTerm (size_t i, const VarianceSwap& varianceSwap) const;
-    double u_1Term (const VarianceSwap& varianceSwap) const;
-    double u_iTerm (size_t i, const VarianceSwap& varianceSwap) const;
+    double qtildeTerm () const;
+    double cTerm (double t) const;
+    double wTerm (double t) const;
+    double u1Term (double t1, double t2) const;
+    double uiTerm (double t1, double t2) const;
+public:
+    VarianceSwapsHestonAnalyticalPricer(const HestonModel& hestonModel);
+    ~VarianceSwapsHestonAnalyticalPricer();
     double price(const VarianceSwap& varianceSwap) const override;
 };
 

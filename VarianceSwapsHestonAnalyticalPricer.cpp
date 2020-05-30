@@ -13,40 +13,57 @@ VarianceSwapsHestonAnalyticalPricer::~VarianceSwapsHestonAnalyticalPricer()
 {
 
 }
+
+std::complex<double>j(0.,1.);
 //useful variables to compute function C and D
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 aTerm(double omega) const {
-    std::complex<double> j(0.,1.);
     return hestonModel_->getMeanReversionSpeed() - hestonModel_->getCorrelation() * hestonModel_->getVolOfVol() * omega * j  ;
 }
 
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 bTerm(double omega) const {
-    std::complex<double> j(0.,1.);
-    return sqrt(aTerm(omega)+ hestonModel_->getVolOfVol() * hestonModel_->getVolOfVol() * (j*omega + omega*omega) )  ;
+    double sigma = hestonModel_->getVolOfVol();
+    std::complex<double> a = aTerm(omega);
+    return std::sqrt(a*a+ sigma*sigma * (j*omega + omega*omega) )  ;
 }
 
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 gTerm(double omega) const {
-    //return (aTerm(omega)-bTerm(omega))/(aTerm(omega)+bTerm(omega)); //defintion during class
-    return (aTerm(omega)+bTerm(omega))/(aTerm(omega)-bTerm(omega)); //definition in PDF
+    std::complex<double> a = aTerm(omega),
+                    b = bTerm(omega);
+    // std::cout << a << " " << b << std::endl;
+    // std::cout << a-b << std::endl;
+    return (a-b)/(a+b); //defintion during class
+    // return (a+b)/(a-b); //definition in PDF
 }
 
 //functions C and D and their derivatives
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 functionC(double tau, double omega) const {
-    std::complex<double> j(0.,1.);
-    //return tau * hestonModel_->getDrift() * (j * omega - 1.)+ hestonModel_->getMeanReversionSpeed() *  hestonModel_->getMeanReversionLevel() / (hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()) * ((aTerm(omega)-bTerm(omega))*tau-2.*log((1.-gTerm(omega)*exp(-bTerm(omega)*tau))/(1.-gTerm(omega)))) ; //definition in class
-    return tau * hestonModel_->getDrift() * (j * omega - 1.)+ hestonModel_->getMeanReversionSpeed() *  hestonModel_->getMeanReversionLevel() / (hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()) * ((aTerm(omega)+bTerm(omega))*tau-2.*log((1.-gTerm(omega)*exp(bTerm(omega)*tau))/(1.-gTerm(omega)))) ; // definition in PDF
+    double r = hestonModel_->getDrift(),
+           kappa = hestonModel_->getMeanReversionSpeed(),
+           theta = hestonModel_->getMeanReversionLevel(),
+           sigma = hestonModel_->getVolOfVol();
+    std::complex<double> a = aTerm(omega),
+                        b = bTerm(omega),
+                        g = gTerm(omega);
+    // std::cout << a << " " << b << " " << g << std::endl;
+    return tau * r * (j * omega - 1.)+ kappa * theta / (sigma*sigma) * ((a-b)*tau-2.*std::log((1.-g*std::exp(-b*tau))/(1.-g))) ; // definition in class
+    // return tau * r * (j * omega - 1.)+ kappa * theta / (sigma*sigma) * ((a+b)*tau-2.*std::log((1.-g*std::exp(b*tau))/(1.-g))) ; // definition in PDF
 }
 
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 functionD(double tau, double omega) const {
-    std::complex<double> D_init;
+    double sigma = hestonModel_->getVolOfVol();
+    std::complex<double> a = aTerm(omega), 
+                         b = bTerm(omega),
+                         g = gTerm(omega);
+    std::complex<double> D_init = (a-b)/(sigma*sigma); //definition during class
+    // std::complex<double> D_init = (a+b)/(sigma*sigma); //definition in PDF
     //D_init=(aTerm(omega)-bTerm(omega))/(hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()); // definition in class
-    D_init=(aTerm(omega)+bTerm(omega))/(hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()); //definition in PDF
-    //return D_init*(aTerm(omega)+bTerm(omega))*(1.-exp(-bTerm(omega)*tau))/(1.-gTerm(omega)*exp(-bTerm(omega)*tau)); // in class
-    return D_init*(aTerm(omega)+bTerm(omega))*(1.-exp(bTerm(omega)*tau))/(1.-gTerm(omega)*exp(bTerm(omega)*tau)); // in PDF
+    return D_init*(1.-std::exp(-b*tau))/(1.-g*std::exp(-b*tau)); // in class
+    // return D_init*(1.-std::exp(b*tau))/(1.-g*std::exp(b*tau)); // in PDF
 }
 
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
@@ -83,48 +100,67 @@ functionDSecond(double tau, double omega) const {
 
 //useful terms in respect of the Chi2 law
 double VarianceSwapsHestonAnalyticalPricer::
-qtilde() const {
-    return (2*hestonModel_->getMeanReversionSpeed()/(hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()));
+qtildeTerm() const {
+    double kappa = hestonModel_->getMeanReversionSpeed(), 
+           theta = hestonModel_->getMeanReversionLevel(),
+           sigma = hestonModel_->getVolOfVol();
+    return (2*kappa*theta/(sigma*sigma));
 }
 
 double VarianceSwapsHestonAnalyticalPricer::
-cTerm(size_t i, const VarianceSwap& varianceSwap) const {
-    std::vector<double> dates = varianceSwap.getDates();
-    return 2 * hestonModel_->getMeanReversionSpeed() / (hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()*(1.-exp(-hestonModel_->getMeanReversionSpeed()*dates[i-1])));
+cTerm(double t) const {
+    double kappa = hestonModel_->getMeanReversionSpeed(),
+           sigma = hestonModel_->getVolOfVol();
+    return 2 * kappa / (sigma*sigma*(1.-std::exp(-kappa*t)));
 }
 
 double VarianceSwapsHestonAnalyticalPricer::
-wTerm(size_t i, const VarianceSwap &varianceSwap) const {
-    std::vector<double> dates = varianceSwap.getDates();
-    return cTerm(i, varianceSwap)*exp(-hestonModel_->getMeanReversionSpeed()*dates[i-1])*hestonModel_->getInitialVolatility();
+wTerm(double t) const {
+    return cTerm(t)*std::exp(-hestonModel_->getMeanReversionSpeed()*t)*hestonModel_->getInitialVolatility();
 }
 
 //log²(Sti/Sti-1)
 double VarianceSwapsHestonAnalyticalPricer::
-u_1Term(const VarianceSwap &varianceSwap) const {
-    std::vector<double> dates = varianceSwap.getDates();
-    double first_term = (functionDPrime(dates[1],0.).real() * hestonModel_->getVolOfVol())*(functionDPrime(dates[1],0.).real() * hestonModel_->getVolOfVol());
-    double second_term = hestonModel_->getVolOfVol()*(2*functionCPrime(dates[1],0.).real() * functionDPrime(dates[1],0.).real() - functionDSecond(dates[1],0.).real());
-    double third_term = functionCPrime(dates[1],0.).real() * functionCPrime(dates[1],0.).real() - functionCSecond(dates[1],0.).real();
-    return (first_term + second_term + third_term) ;
+u1Term(double t1, double t2) const {
+    double delta = t2-t1,
+           v0 = hestonModel_->getInitialVolatility(),
+           C1 = functionCPrime(delta,0.).real(),
+           C2 = functionCSecond(delta,0.).real(),
+           D1 = functionDPrime(delta,0.).real(),
+           D2 = functionDSecond(delta,0.).real();
+    double firstTerm = D1*D1*v0*v0;
+    double secondTerm = v0*(2*C1*D1-D2);
+    double thirdTerm = C1*C1 - C2;
+    return firstTerm + secondTerm + thirdTerm ;
 }
 
 double VarianceSwapsHestonAnalyticalPricer::
-u_iTerm(size_t i, const VarianceSwap &varianceSwap) const {
-    std::vector<double> dates = varianceSwap.getDates();
-    double first_term = (( qtilde() + 2*wTerm(i,varianceSwap))+(qtilde() + wTerm(i,varianceSwap))*(qtilde() + wTerm(i,varianceSwap))) * functionDPrime(dates[i]-dates[i-1],0.).real() * functionDPrime(dates[i]-dates[i-1],0.).real() / (cTerm(i, varianceSwap)*cTerm(i, varianceSwap));
-    double second_term = (qtilde()+wTerm(i,varianceSwap))*(2*functionCPrime(dates[i]-dates[i-1],0.).real() * functionDPrime(dates[i]-dates[i-1],0.).real() - functionDSecond(dates[i]-dates[i-1],0.).real()) / cTerm(i,varianceSwap);
-    double third_term= (functionCPrime(dates[i]-dates[i-1],0.).real() * functionCPrime(dates[i]-dates[i-1],0.).real() - functionCSecond(dates[i]-dates[i-1],0.).real());
-    return (first_term + second_term + third_term) ;
+uiTerm(double t1, double t2) const {
+    double delta = t2-t1,
+           qtilde = qtildeTerm(),
+           Wi = wTerm(t1),
+           ci = cTerm(t1),
+           C1 = functionCPrime(delta,0.).real(),
+           C2 = functionCSecond(delta,0.).real(),
+           D1 = functionDPrime(delta,0.).real(),
+           D2 = functionDSecond(delta,0.).real();
+    double firstTerm = (qtilde+2*Wi+(qtilde + Wi)*(qtilde + Wi)) 
+                        *D1*D1/(ci*ci);
+    double secondTerm = (qtilde+Wi)*(2*C1*D1 - D2) / ci;
+    double thirdTerm= C1*C1 - C2;
+    return firstTerm + secondTerm + thirdTerm ;
 }
 
 double VarianceSwapsHestonAnalyticalPricer::price(const VarianceSwap& varianceSwap) const{
     double price=0;
-    price = price + u_1Term(varianceSwap);
     std::vector<double> dates = varianceSwap.getDates();
-    for (std::size_t i = 2; i < dates.size()+1; i++){
-        price = price + u_iTerm(i,varianceSwap);
+
+    price = price + u1Term(dates[0],dates[1]);
+    for (std::size_t i = 2; i < dates.size(); i++)
+    {   
+        // std::cout << uiTerm(dates[i-1],dates[i]) << std::endl;
+        price = price + uiTerm(dates[i-1],dates[i]);
     }
-    price = price * 10000. / (dates.size()*(dates[1]-dates[0]));
+    price = price * 10000. / dates.back();
     return price;
 }

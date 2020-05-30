@@ -22,7 +22,7 @@ int main()
     std::vector<double> dates = varianceSwap.getDates();
 
     //Simulation parameters
-    size_t nbSimulations = 100000, nbTimePoints = 100;
+    size_t nbSimulations = 10000, nbTimePoints = 100;
     std::vector<double> timePoints, temp;
     for(std::size_t i = 0; i < dates.size()-1; i++)
     {   
