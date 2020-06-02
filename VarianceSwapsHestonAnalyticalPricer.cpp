@@ -123,15 +123,16 @@ wTerm(double t) const {
 double VarianceSwapsHestonAnalyticalPricer::
 u1Term(double t1, double t2) const {
     double delta = t2-t1,
-           v0 = hestonModel_->getInitialVolatility(),
-           C1 = functionCPrime(delta,0.).real(),
-           C2 = functionCSecond(delta,0.).real(),
-           D1 = functionDPrime(delta,0.).real(),
-           D2 = functionDSecond(delta,0.).real();
-    double firstTerm = D1*D1*v0*v0;
-    double secondTerm = v0*(2*C1*D1-D2);
-    double thirdTerm = C1*C1 - C2;
-    return firstTerm + secondTerm + thirdTerm ;
+           v0 = hestonModel_->getInitialVolatility();
+    std::complex<double> C1 = functionCPrime(delta,0.),
+                        C2 = functionCSecond(delta,0.),
+                        D1 = functionDPrime(delta,0.),
+                        D2 = functionDSecond(delta,0.);
+    std::complex<double> firstTerm = D1*D1*v0*v0,
+                        secondTerm = v0*(2.0*C1*D1-D2),
+                        thirdTerm = C1*C1 - C2;
+    std::complex<double> u1 = firstTerm+secondTerm+thirdTerm; 
+    return u1.real();
 }
 
 double VarianceSwapsHestonAnalyticalPricer::
@@ -139,16 +140,17 @@ uiTerm(double t1, double t2) const {
     double delta = t2-t1,
            qtilde = qtildeTerm(),
            Wi = wTerm(t1),
-           ci = cTerm(t1),
-           C1 = functionCPrime(delta,0.).real(),
-           C2 = functionCSecond(delta,0.).real(),
-           D1 = functionDPrime(delta,0.).real(),
-           D2 = functionDSecond(delta,0.).real();
-    double firstTerm = (qtilde+2*Wi+(qtilde + Wi)*(qtilde + Wi)) 
-                        *D1*D1/(ci*ci);
-    double secondTerm = (qtilde+Wi)*(2*C1*D1 - D2) / ci;
-    double thirdTerm= C1*C1 - C2;
-    return firstTerm + secondTerm + thirdTerm ;
+           ci = cTerm(t1);
+    std::complex<double> C1 = functionCPrime(delta,0.),
+           C2 = functionCSecond(delta,0.),
+           D1 = functionDPrime(delta,0.),
+           D2 = functionDSecond(delta,0.);
+    std::complex<double> firstTerm = (qtilde+2*Wi+(qtilde + Wi)*(qtilde + Wi)) 
+                                        *D1*D1/(ci*ci),
+                        secondTerm = (qtilde+Wi)*(2.0*C1*D1 - D2) / ci,
+                        thirdTerm= C1*C1 - C2;
+    std::complex<double> ui = firstTerm+secondTerm+thirdTerm;
+    return ui.real();
 }
 
 double VarianceSwapsHestonAnalyticalPricer::price(const VarianceSwap& varianceSwap) const{
