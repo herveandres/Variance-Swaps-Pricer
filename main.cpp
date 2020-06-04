@@ -9,6 +9,32 @@
 #include "VarianceSwapsHestonMonteCarloPricer.h"
 #include "VarianceSwapsHestonAnalyticalPricer.h"
 
+void testNbOfObservations()
+{
+    //Heston model parameters
+    double drift = 0, kappa = 0.5, theta = 0.04, eps = 1, rho = -0.9,
+            V0 = 0.04, X0 = 100;
+
+    HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+
+    //Variance swap parameters
+    double maturity = 10.0;
+    double nbOfObservations;
+
+    for (size_t i=2 ; i<10 ; i++)
+    {
+        nbOfObservations= i*maturity+1;
+
+        VarianceSwap varianceSwap(maturity,nbOfObservations);
+
+        std::cout << "Analytical computation of the price for " << nbOfObservations << " observations" << std::endl;
+        VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
+        double analyticalPrice = anPricer.price(varianceSwap);
+        std::cout << analyticalPrice << std::endl << std::endl;
+
+    }
+}
+
 void testThreeParametersSets()
 {
     std::vector<std::map<std::string,double> > parametersSets;
@@ -155,6 +181,7 @@ void testEvolutionMCPricesWithDiscretizationTimestep()
 int main()
 {   
     // testThreeParametersSets();
-    testEvolutionMCPricesWithDiscretizationTimestep();
+    //testEvolutionMCPricesWithDiscretizationTimestep();
+    testNbOfObservations();
     return 0;
 }
