@@ -21,7 +21,11 @@ void testNbOfObservations()
     double maturity = 10.0;
     double nbOfObservations;
 
-    for (size_t i=2 ; i<10 ; i++)
+    std::ofstream file;
+    file.open ("../Tests/test_convergence_nb_of_observations_analytical.csv");
+    file << "Nombre d'observations;Prix Analytique \n";
+
+    for (size_t i=2 ; i<31 ; i=i+2)
     {
         nbOfObservations= i*maturity+1;
 
@@ -32,7 +36,11 @@ void testNbOfObservations()
         double analyticalPrice = anPricer.price(varianceSwap);
         std::cout << analyticalPrice << std::endl << std::endl;
 
+        file << nbOfObservations << ";";
+        file << analyticalPrice << "\n";
+
     }
+    file.close();
 }
 
 void testNbOfSimulations()
@@ -55,30 +63,36 @@ void testNbOfSimulations()
     std::cout << analyticalPrice << std::endl << std::endl;
 
     size_t nbSimulationsMin=10000;
-    size_t nbSimulationsMax=80000;
+    size_t nbSimulationsMax=100000;
     size_t nbTimePoints = 200;
     std::vector<double> dates = varianceSwap.getDates();
 
-    for (size_t nbSimulations = nbSimulationsMin; nbSimulations<nbSimulationsMax+1 ; nbSimulations=nbSimulations+10000 ){
+    std::vector<double> timePoints, temp;
+    for(std::size_t j = 0; j < dates.size()-1; j++)
+    {
+        temp = MathFunctions::buildLinearSpace(dates[j],dates[j+1],nbTimePoints);
+        timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
+        if(j == dates.size()-2)
+            timePoints.push_back(temp.back());
+    }
+
+    TruncatedGaussianScheme truncatedGaussianScheme(timePoints,hestonModel);
+    BroadieKayaScheme broadieKayaSchemeTG(timePoints,hestonModel,truncatedGaussianScheme);
+
+    QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel);
+    BroadieKayaScheme broadieKayaSchemeQE(timePoints,hestonModel,quadraticExponentialScheme);
+
+    for (size_t nbSimulations = nbSimulationsMin; nbSimulations<nbSimulationsMax+1 ; nbSimulations=nbSimulations+20000 ){
 
         std::cout << "---------- Nombre de simulations : " << nbSimulations << " ----------" << std::endl << std::endl;
         std::cout << "Computation of the price using TG + BroadieKaya" << std::endl;
-        std::vector<double> timePoints, temp;
-        for(std::size_t j = 0; j < dates.size()-1; j++)
-        {
-            temp = MathFunctions::buildLinearSpace(dates[j],dates[j+1],nbTimePoints);
-            timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
-        }
 
-        TruncatedGaussianScheme truncatedGaussianScheme(timePoints,hestonModel);
-        BroadieKayaScheme broadieKayaSchemeTG(timePoints,hestonModel,truncatedGaussianScheme);
         VarianceSwapsHestonMonteCarloPricer mcPricerBKTG(hestonModel,broadieKayaSchemeTG,nbSimulations);
         double BKTGprice = mcPricerBKTG.price(varianceSwap);
         std::cout << BKTGprice << std::endl << std::endl;
 
         std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
-        QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel);
-        BroadieKayaScheme broadieKayaSchemeQE(timePoints,hestonModel,quadraticExponentialScheme);
+
         VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(hestonModel,broadieKayaSchemeQE,nbSimulations);
         double BKQEprice = mcPricerBKQE.price(varianceSwap);
         std::cout << BKQEprice << std::endl << std::endl << std::endl;
@@ -234,7 +248,7 @@ int main()
 {   
     // testThreeParametersSets();
     //testEvolutionMCPricesWithDiscretizationTimestep();
-    //testNbOfObservations();
-    testNbOfSimulations();
+    testNbOfObservations();
+    //testNbOfSimulations();
     return 0;
 }
