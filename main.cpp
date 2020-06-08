@@ -63,7 +63,8 @@ void testNbOfSimulations()
     std::cout << analyticalPrice << std::endl << std::endl;
 
     size_t nbSimulationsMin=10000;
-    size_t nbSimulationsMax=100000;
+    size_t nbSimulationsMax=210000;
+    size_t pasSimulations=40000;
     size_t nbTimePoints = 200;
     std::vector<double> dates = varianceSwap.getDates();
 
@@ -82,7 +83,11 @@ void testNbOfSimulations()
     QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel);
     BroadieKayaScheme broadieKayaSchemeQE(timePoints,hestonModel,quadraticExponentialScheme);
 
-    for (size_t nbSimulations = nbSimulationsMin; nbSimulations<nbSimulationsMax+1 ; nbSimulations=nbSimulations+20000 ){
+    std::ofstream file;
+    file.open ("../Tests/test_convergence_nb_of_simulations.csv");
+    file << "Nombre de simulations;Prix BKTG;Prix BKQE \n";
+
+    for (size_t nbSimulations = nbSimulationsMin; nbSimulations<nbSimulationsMax+1 ; nbSimulations=nbSimulations+pasSimulations ){
 
         std::cout << "---------- Nombre de simulations : " << nbSimulations << " ----------" << std::endl << std::endl;
         std::cout << "Computation of the price using TG + BroadieKaya" << std::endl;
@@ -91,13 +96,18 @@ void testNbOfSimulations()
         double BKTGprice = mcPricerBKTG.price(varianceSwap);
         std::cout << BKTGprice << std::endl << std::endl;
 
+        file << nbSimulations << ";";
+        file << BKTGprice << ";";
+
         std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
 
         VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(hestonModel,broadieKayaSchemeQE,nbSimulations);
         double BKQEprice = mcPricerBKQE.price(varianceSwap);
         std::cout << BKQEprice << std::endl << std::endl << std::endl;
 
+        file << BKQEprice << "\n";
     }
+    file.close();
 
 }
 
@@ -157,7 +167,7 @@ void testThreeParametersSets()
         {   
             temp = MathFunctions::buildLinearSpace(dates[j],dates[j+1],nbTimePoints);
             timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
-            if(i == dates.size()-2)
+            if(j == dates.size()-2)
                 timePoints.push_back(temp.back());
         }
 
@@ -220,7 +230,7 @@ void testEvolutionMCPricesWithDiscretizationTimestep()
         {   
             temp = MathFunctions::buildLinearSpace(dates[j],dates[j+1],nbTimePoints[i]);
             timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
-            if(i == dates.size()-2)
+            if(j == dates.size()-2)
                 timePoints.push_back(temp.back());
         }
         std::cout << "---------- Nombre de points : " << nbTimePoints[i] << " ----------" << std::endl << std::endl;
@@ -248,7 +258,7 @@ int main()
 {   
     // testThreeParametersSets();
     //testEvolutionMCPricesWithDiscretizationTimestep();
-    testNbOfObservations();
-    //testNbOfSimulations();
+    //testNbOfObservations();
+    testNbOfSimulations();
     return 0;
 }
