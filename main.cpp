@@ -20,12 +20,13 @@ void testNbOfObservations()
     //Variance swap parameters
     double maturity = 10.0;
     double nbOfObservations;
+    double nbOfObservationsMax= 256;
 
     std::ofstream file;
     file.open ("../Tests/test_convergence_nb_of_observations_analytical.csv");
     file << "Nombre d'observations;Prix Analytique \n";
 
-    for (size_t i=2 ; i<31 ; i=i+2)
+    for (size_t i=2 ; i<nbOfObservationsMax+1 ; i=i+10)
     {
         nbOfObservations= i*maturity+1;
 
@@ -62,8 +63,8 @@ void testNbOfSimulations()
     double analyticalPrice = anPricer.price(varianceSwap);
     std::cout << analyticalPrice << std::endl << std::endl;
 
-    size_t nbSimulationsMin=10000;
-    size_t nbSimulationsMax=210000;
+    size_t nbSimulationsMin=1000000;
+    size_t nbSimulationsMax=1000000;
     size_t pasSimulations=40000;
     size_t nbTimePoints = 200;
     std::vector<double> dates = varianceSwap.getDates();
@@ -258,7 +259,7 @@ int main()
 {   
     // testThreeParametersSets();
     //testEvolutionMCPricesWithDiscretizationTimestep();
-    //testNbOfObservations();
-    testNbOfSimulations();
+    testNbOfObservations();
+    //testNbOfSimulations();
     return 0;
 }
