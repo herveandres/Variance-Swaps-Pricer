@@ -182,7 +182,7 @@ void testThreeParametersSets()
     }
 }
 
-void testEvolutionMCPricesWithDiscretizationTimestep()
+void testDiscretizationTimestep()
 {
     //Heston model parameters
     double drift = 0, kappa = 0.5, theta = 0.04, eps = 1, rho = -0.9,
@@ -220,7 +220,7 @@ void testEvolutionMCPricesWithDiscretizationTimestep()
         {   
             temp = MathFunctions::buildLinearSpace(dates[j],dates[j+1],nbTimePoints[i]);
             timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
-            if(i == dates.size()-2)
+            if(j == dates.size()-2)
                 timePoints.push_back(temp.back());
         }
         std::cout << "---------- Nombre de points : " << nbTimePoints[i] << " ----------" << std::endl << std::endl;
@@ -247,8 +247,8 @@ void testEvolutionMCPricesWithDiscretizationTimestep()
 int main()
 {   
     // testThreeParametersSets();
-    //testEvolutionMCPricesWithDiscretizationTimestep();
-    testNbOfObservations();
-    //testNbOfSimulations();
+    // testDiscretizationTimestep();
+    // testNbOfObservations();
+    testNbOfSimulations();
     return 0;
 }
