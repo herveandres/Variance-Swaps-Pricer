@@ -3,21 +3,16 @@
 #include "MathFunctions.h"
 
 HestonLogSpotPathSimulator::HestonLogSpotPathSimulator(
-                                const std::vector<double>& timePoints,
-                                const HestonModel& hestonModel,
                                 const HestonVariancePathSimulator& variancePathSimulator):
-                                PathSimulator(std::log(hestonModel.getInitialAssetValue()),
-                                              timePoints),
-                                hestonModel_(new HestonModel(hestonModel)),
+                                PathSimulator(std::log(variancePathSimulator.getHestonModel().getInitialAssetValue()),
+                                              variancePathSimulator.getTimePoints()),
                                 variancePathSimulator_(variancePathSimulator.clone())
 { 
-    // Rajouter éventuellement une exception qui permet de gérer le cas où
-    //les timePoints de variancePathSimulator correspondent pas à ceux du logspot
+
 }
 
 HestonLogSpotPathSimulator::~HestonLogSpotPathSimulator()
 {
-    delete hestonModel_;
     delete variancePathSimulator_;
 }
 
@@ -32,21 +27,18 @@ std::vector<double> HestonLogSpotPathSimulator::path() const
 }
 
 
-BroadieKayaScheme::BroadieKayaScheme(const std::vector<double>& timePoints,
-                    const HestonModel& hestonModel,
+BroadieKayaScheme::BroadieKayaScheme(
                     const HestonVariancePathSimulator& variancePathSimulator,
                     double gamma1,
                     double gamma2):
-        HestonLogSpotPathSimulator(timePoints, hestonModel, variancePathSimulator),
+        HestonLogSpotPathSimulator(variancePathSimulator),
         gamma1_(gamma1), gamma2_(gamma2)
 {
     preComputations();
 }
 
 BroadieKayaScheme::BroadieKayaScheme(const BroadieKayaScheme& broadieKayaScheme):
-        HestonLogSpotPathSimulator(broadieKayaScheme.timePoints_,
-                                    *broadieKayaScheme.hestonModel_,
-                                    *broadieKayaScheme.variancePathSimulator_),
+        HestonLogSpotPathSimulator(*broadieKayaScheme.variancePathSimulator_),
         gamma1_(broadieKayaScheme.gamma1_), gamma2_(broadieKayaScheme.gamma2_),
         k0_(broadieKayaScheme.k0_), k1_(broadieKayaScheme.k1_),
         k2_(broadieKayaScheme.k2_), k3_(broadieKayaScheme.k3_),
@@ -57,10 +49,11 @@ BroadieKayaScheme::BroadieKayaScheme(const BroadieKayaScheme& broadieKayaScheme)
 
 void BroadieKayaScheme::preComputations()
 {
-    double rho = hestonModel_->getCorrelation();
-    double theta = hestonModel_->getMeanReversionLevel();
-    double kappa = hestonModel_->getMeanReversionSpeed();
-    double eps = hestonModel_->getVolOfVol();
+    HestonModel hestonModel = variancePathSimulator_->getHestonModel();
+    double rho = hestonModel.getCorrelation();
+    double theta = hestonModel.getMeanReversionLevel();
+    double kappa = hestonModel.getMeanReversionSpeed();
+    double eps = hestonModel.getVolOfVol();
     double delta;
     for(std::size_t i = 0; i < timePoints_.size()-1; i++)
     {

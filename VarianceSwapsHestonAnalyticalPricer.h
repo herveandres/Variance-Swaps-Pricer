@@ -7,6 +7,7 @@
 class VarianceSwapsHestonAnalyticalPricer : public VarianceSwapsHestonPricer
 {
 private:
+    HestonModel* hestonModel_;
     std::complex<double> aTerm (double omega) const ;
     std::complex<double> bTerm (double omega) const ;
     std::complex<double> gTerm (double omega) const ;

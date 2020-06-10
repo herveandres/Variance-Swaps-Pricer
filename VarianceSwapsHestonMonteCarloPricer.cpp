@@ -2,10 +2,9 @@
 #include <iostream>
 
 VarianceSwapsHestonMonteCarloPricer::VarianceSwapsHestonMonteCarloPricer
-                                (const HestonModel& hestonModel,
-                                const HestonLogSpotPathSimulator& hestonPathSimulator,
+                                (const HestonLogSpotPathSimulator& hestonPathSimulator,
                                 std::size_t nbSimulations):
-            VarianceSwapsHestonPricer(hestonModel), hestonPathSimulator_(hestonPathSimulator.clone()),
+            hestonPathSimulator_(hestonPathSimulator.clone()),
             nbSimulations_(nbSimulations)
 {
 
@@ -36,7 +35,7 @@ double VarianceSwapsHestonMonteCarloPricer::price(const VarianceSwap& varianceSw
     //We look for the indexes of the simulated path corresponding to the dates 
     //of the variance swaps
     std::vector<double> indexes;
-    std::size_t nbSimulationsBetweenDates = (simulationTimeSteps.size()-1)/(dates.size()-1);
+    std::size_t nbSimulationsBetweenDates = (simulationTimeSteps.size()+dates.size()-2)/(dates.size()-1);
     for(size_t i = 0; i < dates.size(); i++)
     {
         indexes.push_back((nbSimulationsBetweenDates-1)*i);

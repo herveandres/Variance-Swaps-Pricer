@@ -79,10 +79,10 @@ void testNbOfSimulations()
     }
 
     TruncatedGaussianScheme truncatedGaussianScheme(timePoints,hestonModel);
-    BroadieKayaScheme broadieKayaSchemeTG(timePoints,hestonModel,truncatedGaussianScheme);
+    BroadieKayaScheme broadieKayaSchemeTG(truncatedGaussianScheme);
 
     QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel);
-    BroadieKayaScheme broadieKayaSchemeQE(timePoints,hestonModel,quadraticExponentialScheme);
+    BroadieKayaScheme broadieKayaSchemeQE(quadraticExponentialScheme);
 
     std::ofstream file;
     file.open ("../Tests/test_convergence_nb_of_simulations.csv");
@@ -93,7 +93,7 @@ void testNbOfSimulations()
         std::cout << "---------- Nombre de simulations : " << nbSimulations << " ----------" << std::endl << std::endl;
         std::cout << "Computation of the price using TG + BroadieKaya" << std::endl;
 
-        VarianceSwapsHestonMonteCarloPricer mcPricerBKTG(hestonModel,broadieKayaSchemeTG,nbSimulations);
+        VarianceSwapsHestonMonteCarloPricer mcPricerBKTG(broadieKayaSchemeTG,nbSimulations);
         double BKTGprice = mcPricerBKTG.price(varianceSwap);
         std::cout << BKTGprice << std::endl << std::endl;
 
@@ -102,7 +102,7 @@ void testNbOfSimulations()
 
         std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
 
-        VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(hestonModel,broadieKayaSchemeQE,nbSimulations);
+        VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(broadieKayaSchemeQE,nbSimulations);
         double BKQEprice = mcPricerBKQE.price(varianceSwap);
         std::cout << BKQEprice << std::endl << std::endl << std::endl;
 
@@ -180,14 +180,14 @@ void testThreeParametersSets()
 
         std::cout << "Computation of the price using TG + BroadieKaya" << std::endl;
         TruncatedGaussianScheme truncatedGaussianScheme(timePoints,hestonModels[i]);
-        BroadieKayaScheme broadieKayaSchemeTG(timePoints,hestonModels[i],truncatedGaussianScheme);
-        VarianceSwapsHestonMonteCarloPricer mcPricerBKTG(hestonModels[i],broadieKayaSchemeTG,nbSimulations);
+        BroadieKayaScheme broadieKayaSchemeTG(truncatedGaussianScheme);
+        VarianceSwapsHestonMonteCarloPricer mcPricerBKTG(broadieKayaSchemeTG,nbSimulations);
         std::cout << mcPricerBKTG.price(varianceSwaps[i]) << std::endl << std::endl;
 
         std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
         QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModels[i]);
-        BroadieKayaScheme broadieKayaSchemeQE(timePoints,hestonModels[i],quadraticExponentialScheme);
-        VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(hestonModels[i],broadieKayaSchemeQE,nbSimulations);
+        BroadieKayaScheme broadieKayaSchemeQE(quadraticExponentialScheme);
+        VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(broadieKayaSchemeQE,nbSimulations);
         std::cout << mcPricerBKQE.price(varianceSwaps[i]) << std::endl;
         std::cout << std::endl << std::endl;
     }
@@ -209,7 +209,7 @@ void testDiscretizationTimestep()
 
 
     std::ofstream file;
-    file.open ("../Tests/test_convergence_timestep_wider.csv");
+    file.open ("../Tests/test_convergence_timestep_wider_bis.csv");
     //Pricing analytique
     std::cout << "Analytical computation of the price" << std::endl;
     VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
@@ -237,16 +237,16 @@ void testDiscretizationTimestep()
         std::cout << "---------- Nombre de points : " << nbTimePoints[i] << " ----------" << std::endl << std::endl;
         std::cout << "Computation of the price using TG + BroadieKaya" << std::endl;
         TruncatedGaussianScheme truncatedGaussianScheme(timePoints,hestonModel);
-        BroadieKayaScheme broadieKayaSchemeTG(timePoints,hestonModel,truncatedGaussianScheme);
-        VarianceSwapsHestonMonteCarloPricer mcPricerBKTG(hestonModel,broadieKayaSchemeTG,nbSimulations);
+        BroadieKayaScheme broadieKayaSchemeTG(truncatedGaussianScheme);
+        VarianceSwapsHestonMonteCarloPricer mcPricerBKTG(broadieKayaSchemeTG,nbSimulations);
         double BKTGprice = mcPricerBKTG.price(varianceSwap);
         std::cout << BKTGprice << std::endl << std::endl;
         file << BKTGprice << ";";
 
         std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
         QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel);
-        BroadieKayaScheme broadieKayaSchemeQE(timePoints,hestonModel,quadraticExponentialScheme);
-        VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(hestonModel,broadieKayaSchemeQE,nbSimulations);
+        BroadieKayaScheme broadieKayaSchemeQE(quadraticExponentialScheme);
+        VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(broadieKayaSchemeQE,nbSimulations);
         double BKQEprice = mcPricerBKQE.price(varianceSwap);
         std::cout << BKQEprice << std::endl << std::endl << std::endl;
         file << BKQEprice << "\n";
@@ -258,8 +258,9 @@ void testDiscretizationTimestep()
 int main()
 {   
     // testThreeParametersSets();
-    // testDiscretizationTimestep();
+    testDiscretizationTimestep();
     // testNbOfObservations();
-    testNbOfSimulations();
+    // testNbOfSimulations();
+        //Heston model parameters
     return 0;
 }

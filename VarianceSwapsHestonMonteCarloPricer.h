@@ -11,8 +11,7 @@ private:
     size_t nbSimulations_;
     double pathPrice(std::vector<double> path, double maturity) const;
 public:
-    VarianceSwapsHestonMonteCarloPricer(const HestonModel& hestonModel,
-                                        const HestonLogSpotPathSimulator& hestonPathSimulator,
+    VarianceSwapsHestonMonteCarloPricer(const HestonLogSpotPathSimulator& hestonPathSimulator,
                                         std::size_t nbSimulations);
     ~VarianceSwapsHestonMonteCarloPricer();
     double price(const VarianceSwap& varianceSwap) const override;

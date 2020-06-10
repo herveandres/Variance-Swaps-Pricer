@@ -7,13 +7,10 @@
 class HestonLogSpotPathSimulator : public PathSimulator
 {
 protected:
-    const HestonModel* hestonModel_;
     const HestonVariancePathSimulator* variancePathSimulator_;
     virtual double nextStep(std::size_t currentIndex, double currentValue, const std::vector<double>& variancePath) const = 0;
 public:
-    HestonLogSpotPathSimulator(const std::vector<double>& timePoints,
-                               const HestonModel& hestonModel,
-                               const HestonVariancePathSimulator& variancePathSimulator);
+    HestonLogSpotPathSimulator(const HestonVariancePathSimulator& variancePathSimulator);
     virtual ~HestonLogSpotPathSimulator();
     virtual HestonLogSpotPathSimulator* clone() const =0;
     std::vector<double> path() const;
@@ -32,9 +29,7 @@ private:
     std::vector<double>  k4_;
     void preComputations();
 public:
-    BroadieKayaScheme(const std::vector<double>& timePoints,
-                         const HestonModel& hestonModel,
-                         const HestonVariancePathSimulator& variancePathSimulator,
+    BroadieKayaScheme(const HestonVariancePathSimulator& variancePathSimulator,
                          double gamma1 = 0.5,
                          double gamma2 = 0.5);
     BroadieKayaScheme(const BroadieKayaScheme& broadieKayaScheme);

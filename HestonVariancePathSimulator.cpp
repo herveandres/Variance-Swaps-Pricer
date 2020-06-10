@@ -48,6 +48,11 @@ std::vector<double> HestonVariancePathSimulator::path() const
 	return path;
 }
 
+HestonModel HestonVariancePathSimulator::getHestonModel() const
+{
+    return *hestonModel_;
+}
+
 TruncatedGaussianScheme::TruncatedGaussianScheme(const std::vector<double>& timePoints,
                                                  const HestonModel& hestonModel,
                                                  double confidenceMultiplier,
@@ -106,7 +111,8 @@ double TruncatedGaussianScheme::nextStep(std::size_t currentIndex, double curren
     double s2 = k3_[currentIndex]*currentValue + k4_[currentIndex];
     double psi = s2/(m*m);
     double mu, sigma;
-    if(psi < 1.0/confidenceMultiplier_*confidenceMultiplier_)
+
+    if(psi < 1.0/(confidenceMultiplier_*confidenceMultiplier_))
     {
         mu = m;
         sigma = sqrt(s2);
@@ -118,7 +124,6 @@ double TruncatedGaussianScheme::nextStep(std::size_t currentIndex, double curren
         //Linear interpolation of fmu and fsigma using the pre-computed values
         double fmu = (fmu_[idxPhi]*(psi1-psi)+fmu_[idxPhi+1]*(psi-psi0))/(psi1-psi0);
         double fsigma = (fsigma_[idxPhi]*(psi1-psi)+fsigma_[idxPhi+1]*(psi-psi0))/(psi1-psi0);
-
         mu = fmu*m;
         sigma = fsigma*sqrt(s2);
     }

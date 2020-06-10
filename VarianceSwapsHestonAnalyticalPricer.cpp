@@ -4,14 +4,14 @@
 
 VarianceSwapsHestonAnalyticalPricer::VarianceSwapsHestonAnalyticalPricer(
                                             const HestonModel& hestonModel):
-                                            VarianceSwapsHestonPricer(hestonModel)
+        hestonModel_(new HestonModel(hestonModel))
 {
     
 }
 
 VarianceSwapsHestonAnalyticalPricer::~VarianceSwapsHestonAnalyticalPricer()
 {
-
+    delete hestonModel_;
 }
 
 std::complex<double>j(0.,1.);
