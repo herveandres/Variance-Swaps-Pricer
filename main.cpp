@@ -20,12 +20,13 @@ void testNbOfObservations()
     //Variance swap parameters
     double maturity = 10.0;
     double nbOfObservations;
+    double nbOfObservationsMax= 256;
 
     std::ofstream file;
     file.open ("../Tests/test_convergence_nb_of_observations_analytical.csv");
     file << "Nombre d'observations;Prix Analytique \n";
 
-    for (size_t i=2 ; i<31 ; i=i+2)
+    for (size_t i=2 ; i<nbOfObservationsMax+1 ; i=i+10)
     {
         nbOfObservations= i*maturity+1;
 
@@ -62,8 +63,9 @@ void testNbOfSimulations()
     double analyticalPrice = anPricer.price(varianceSwap);
     std::cout << analyticalPrice << std::endl << std::endl;
 
-    size_t nbSimulationsMin=10000;
-    size_t nbSimulationsMax=100000;
+    size_t nbSimulationsMin=1000000;
+    size_t nbSimulationsMax=1000000;
+    size_t pasSimulations=40000;
     size_t nbTimePoints = 200;
     std::vector<double> dates = varianceSwap.getDates();
 
@@ -82,7 +84,11 @@ void testNbOfSimulations()
     QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel);
     BroadieKayaScheme broadieKayaSchemeQE(timePoints,hestonModel,quadraticExponentialScheme);
 
-    for (size_t nbSimulations = nbSimulationsMin; nbSimulations<nbSimulationsMax+1 ; nbSimulations=nbSimulations+20000 ){
+    std::ofstream file;
+    file.open ("../Tests/test_convergence_nb_of_simulations.csv");
+    file << "Nombre de simulations;Prix BKTG;Prix BKQE \n";
+
+    for (size_t nbSimulations = nbSimulationsMin; nbSimulations<nbSimulationsMax+1 ; nbSimulations=nbSimulations+pasSimulations ){
 
         std::cout << "---------- Nombre de simulations : " << nbSimulations << " ----------" << std::endl << std::endl;
         std::cout << "Computation of the price using TG + BroadieKaya" << std::endl;
@@ -91,13 +97,18 @@ void testNbOfSimulations()
         double BKTGprice = mcPricerBKTG.price(varianceSwap);
         std::cout << BKTGprice << std::endl << std::endl;
 
+        file << nbSimulations << ";";
+        file << BKTGprice << ";";
+
         std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
 
         VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(hestonModel,broadieKayaSchemeQE,nbSimulations);
         double BKQEprice = mcPricerBKQE.price(varianceSwap);
         std::cout << BKQEprice << std::endl << std::endl << std::endl;
 
+        file << BKQEprice << "\n";
     }
+    file.close();
 
 }
 
@@ -157,7 +168,7 @@ void testThreeParametersSets()
         {   
             temp = MathFunctions::buildLinearSpace(dates[j],dates[j+1],nbTimePoints);
             timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
-            if(i == dates.size()-2)
+            if(j == dates.size()-2)
                 timePoints.push_back(temp.back());
         }
 
