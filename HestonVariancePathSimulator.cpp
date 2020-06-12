@@ -162,7 +162,7 @@ double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double cur
     double U = MathFunctions::simulateUniformRandomVariable();
     if (psi<psiC_){
         double temp_value = 2./psi;
-        double b = sqrt(temp_value - 1. + sqrt(temp_value*(temp_value-1.)));
+        double b = std::sqrt(temp_value - 1. + std::sqrt(temp_value*(temp_value-1.)));
         double a = m/(1+b*b);
         double Zv = MathFunctions::normalCDFInverse(U);
         return a*(b+Zv)*(b+Zv);
@@ -174,7 +174,7 @@ double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double cur
         }
         else{
             double beta = (1-p)/m;
-            return log((1-p)/(1-U))/beta;
+            return std::log((1-p)/(1-U))/beta;
         }
     }
 }

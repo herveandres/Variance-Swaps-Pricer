@@ -53,7 +53,7 @@ void testNbOfSimulations()
     HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
 
     //Variance swap parameters
-    double maturity = 10.0;
+    double maturity = 1.0;
     double nbOfObservations = 2*maturity+1;
 
     VarianceSwap varianceSwap(maturity,nbOfObservations);
@@ -63,10 +63,10 @@ void testNbOfSimulations()
     double analyticalPrice = anPricer.price(varianceSwap);
     std::cout << analyticalPrice << std::endl << std::endl;
 
-    size_t nbSimulationsMin=1000000;
+    size_t nbSimulationsMin=100000;
     size_t nbSimulationsMax=1000000;
-    size_t pasSimulations=40000;
-    size_t nbTimePoints = 200;
+    size_t pasSimulations=100000;
+    size_t nbTimePoints = 1000;
     std::vector<double> dates = varianceSwap.getDates();
 
     std::vector<double> timePoints, temp;
@@ -86,7 +86,7 @@ void testNbOfSimulations()
 
     std::ofstream file;
     file.open ("../Tests/test_convergence_nb_of_simulations.csv");
-    file << "Nombre de simulations;Prix BKTG;Prix BKQE \n";
+    file << "Nombre de simulations;Prix analytique;Prix BKTG;Prix BKQE \n";
 
     for (size_t nbSimulations = nbSimulationsMin; nbSimulations<nbSimulationsMax+1 ; nbSimulations=nbSimulations+pasSimulations ){
 
@@ -98,6 +98,7 @@ void testNbOfSimulations()
         std::cout << BKTGprice << std::endl << std::endl;
 
         file << nbSimulations << ";";
+        file << analyticalPrice << ";";
         file << BKTGprice << ";";
 
         std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
@@ -202,14 +203,14 @@ void testDiscretizationTimestep()
     HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
 
     //Variance swap parameters
-    double maturity = 10.0;
-    std::size_t nbOfObservations = maturity*2+1;
+    double maturity = 1.0;
+    std::size_t nbOfObservations = maturity*2+1; 
 
     VarianceSwap varianceSwap(maturity,nbOfObservations);
 
 
     std::ofstream file;
-    file.open ("../Tests/test_convergence_timestep_wider_bis.csv");
+    file.open ("../Tests/test_convergence_timestep_temp.csv");
     //Pricing analytique
     std::cout << "Analytical computation of the price" << std::endl;
     VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
@@ -220,7 +221,7 @@ void testDiscretizationTimestep()
     file << "Nombre de points;Prix Analytique;Prix BKTG;Prix BKQE \n";
     std::vector<double> dates = varianceSwap.getDates();
     size_t nbSimulations = 10000;
-    std::vector<double> nbTimePoints{100,500,1000,1500,2000,2500,3000};
+    std::vector<double> nbTimePoints{100,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000};
 
     for(std::size_t i = 0; i < nbTimePoints.size(); i++)
     {
@@ -258,9 +259,9 @@ void testDiscretizationTimestep()
 int main()
 {   
     // testThreeParametersSets();
-    testDiscretizationTimestep();
+    // testDiscretizationTimestep();
     // testNbOfObservations();
-    // testNbOfSimulations();
+    testNbOfSimulations();
         //Heston model parameters
     return 0;
 }

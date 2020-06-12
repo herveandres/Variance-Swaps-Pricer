@@ -71,7 +71,7 @@ functionDPrime(double tau, double omega) const {
     std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
         return this->functionD(tau,omega);
     };
-    return MathFunctions::differencesFinies(f,omega,tau);
+    return MathFunctions::finiteDifference(f,omega,tau);
 }
 
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
@@ -79,7 +79,7 @@ functionCPrime(double tau, double omega) const {
     std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
         return this->functionC(tau,omega);
     };
-    return MathFunctions::differencesFinies(f,omega,tau);
+    return MathFunctions::finiteDifference(f,omega,tau);
 }
 
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
@@ -87,7 +87,7 @@ functionCSecond(double tau, double omega) const {
     std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
         return this->functionCPrime(tau,omega);
     };
-    return MathFunctions::differencesFinies(f,omega,tau);
+    return MathFunctions::finiteDifference(f,omega,tau);
 }
 
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
@@ -95,7 +95,7 @@ functionDSecond(double tau, double omega) const {
     std::function<std::complex<double>(double,double)> f = [=](double tau, double omega){
         return this->functionDPrime(tau,omega);
     };
-    return MathFunctions::differencesFinies(f,omega,tau);
+    return MathFunctions::finiteDifference(f,omega,tau);
 }
 
 //useful terms in respect of the Chi2 law

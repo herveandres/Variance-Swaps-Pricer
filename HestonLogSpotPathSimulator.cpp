@@ -71,8 +71,9 @@ BroadieKayaScheme* BroadieKayaScheme::clone() const{
 
 double BroadieKayaScheme::nextStep(std::size_t currentIndex, double currentValue, const std::vector<double>& variancePath) const
 {
-    double U = MathFunctions::simulateUniformRandomVariable();
-    double Z = MathFunctions::normalCDFInverse(U);
+    // double U = MathFunctions::simulateUniformRandomVariable();
+    // double Z = MathFunctions::normalCDFInverse(U);
+    double Z = MathFunctions::simulateGaussianRandomVariable();
     //Ajouter drift
     return currentValue+k0_[currentIndex]+k1_[currentIndex]*variancePath[currentIndex]
             +k2_[currentIndex]*variancePath[currentIndex+1]

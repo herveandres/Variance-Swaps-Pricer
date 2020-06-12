@@ -84,7 +84,7 @@ namespace MathFunctions
         return x;
     }
 
-    std::complex<double> differencesFinies(std::function<std::complex<double>(double,double)> f, double omega, double tau, double epsilon)
+    std::complex<double> finiteDifference(std::function<std::complex<double>(double,double)> f, double omega, double tau, double epsilon)
     {
         return (f(tau,omega+epsilon)-f(tau,omega-epsilon))/(2*epsilon);
     }

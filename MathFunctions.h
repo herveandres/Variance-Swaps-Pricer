@@ -27,7 +27,7 @@ namespace MathFunctions
 
     double newtonMethod(double initialGuess, std::function<double(double)> f, std::function<double(double)> fPrime, double precision = pow(10,-5));
 
-    std::complex<double> differencesFinies(std::function<std::complex<double>(double,double)> f, double omega, double tau, double epsilon=pow(10,-2));
+    std::complex<double> finiteDifference(std::function<std::complex<double>(double,double)> f, double omega, double tau, double epsilon=pow(10,-2));
 
     //Function looking for the index i s.t. list[i] <= x < list[i+1] (list is sorted)
     std::size_t binarySearch(const std::vector<double>& list, double x);
