@@ -166,3 +166,11 @@ double VarianceSwapsHestonAnalyticalPricer::price(const VarianceSwap& varianceSw
     price = price * 10000. / dates.back();
     return price;
 }
+
+double VarianceSwapsHestonAnalyticalPricer::continousPrice(const VarianceSwap &varianceSwap) {
+    double price=0;
+    std::vector<double> dates = varianceSwap.getDates();
+    double maturity=dates.back();
+    price = 10000. * hestonModel_->getMeanReversionLevel() + (hestonModel_->getInitialVolatility()-hestonModel_->getMeanReversionLevel())*(1.-exp(-maturity*hestonModel_->getMeanReversionSpeed()))/(maturity*hestonModel_->getMeanReversionSpeed());
+    return price;
+}

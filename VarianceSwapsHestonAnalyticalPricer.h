@@ -26,6 +26,7 @@ public:
     VarianceSwapsHestonAnalyticalPricer(const HestonModel& hestonModel);
     ~VarianceSwapsHestonAnalyticalPricer();
     double price(const VarianceSwap& varianceSwap) const override;
+    double continousPrice(const VarianceSwap& varianceSwap);
 };
 
 #endif

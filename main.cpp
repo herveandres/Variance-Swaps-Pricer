@@ -20,13 +20,13 @@ void testNbOfObservations()
     //Variance swap parameters
     double maturity = 10.0;
     double nbOfObservations;
-    double nbOfObservationsMax= 256;
+    double nbOfObservationsMax= 1000;
 
     std::ofstream file;
     file.open ("../Tests/test_convergence_nb_of_observations_analytical.csv");
-    file << "Nombre d'observations;Prix Analytique \n";
+    file << "Nombre d'observations;Prix Analytique;Prix Analytique Continu; Différence \n";
 
-    for (size_t i=2 ; i<nbOfObservationsMax+1 ; i=i+10)
+    for (size_t i=2 ; i<nbOfObservationsMax+1 ; i=i+20)
     {
         nbOfObservations= i*maturity+1;
 
@@ -37,8 +37,17 @@ void testNbOfObservations()
         double analyticalPrice = anPricer.price(varianceSwap);
         std::cout << analyticalPrice << std::endl << std::endl;
 
+        std::cout << "Analytical computation of the continous price " << std::endl;
+        double continuousAnalyticalPrice = anPricer.continousPrice(varianceSwap);
+        std::cout << continuousAnalyticalPrice << std::endl << std::endl;
+
+        std::cout << "Difference" << std::endl;
+        std::cout << analyticalPrice-continuousAnalyticalPrice << std::endl << std::endl;
+
         file << nbOfObservations << ";";
-        file << analyticalPrice << "\n";
+        file << analyticalPrice << ";";
+        file << continuousAnalyticalPrice << ";";
+        file << analyticalPrice-continuousAnalyticalPrice << "\n";
 
     }
     file.close();
@@ -300,10 +309,10 @@ void test_QEMC(){
 
 int main()
 {   
-    test_QEMC();
-    // testThreeParametersSets();
-    // testDiscretizationTimestep();
-    // testNbOfObservations();
+    //test_QEMC();
+    //testThreeParametersSets();
+    //testDiscretizationTimestep();
+    testNbOfObservations();
     //testNbOfSimulations();
     //Heston model parameters
     return 0;
