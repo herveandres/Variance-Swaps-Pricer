@@ -117,7 +117,7 @@ void testThreeParametersSets()
 {
     std::vector<std::map<std::string,double> > parametersSets;
 
-    //Heston model parameters and variance 
+    //Heston model parameters and variance
     //Case I
     std::map<std::string,double> parameters;
     parameters["drift"] = 0; parameters["kappa"] = 0.5; parameters["theta"] = 0.04;
@@ -146,15 +146,15 @@ void testThreeParametersSets()
     for(size_t i = 0; i < parametersSets.size(); i++)
     {
         hestonModels.push_back(HestonModel(parametersSets[i]["drift"],
-                                        parametersSets[i]["kappa"],
-                                        parametersSets[i]["theta"],
-                                        parametersSets[i]["eps"],
-                                        parametersSets[i]["rho"],
-                                        parametersSets[i]["V0"],
-                                        parametersSets[i]["X0"]));
+                               parametersSets[i]["kappa"],
+                parametersSets[i]["theta"],
+                parametersSets[i]["eps"],
+                parametersSets[i]["rho"],
+                parametersSets[i]["V0"],
+                parametersSets[i]["X0"]));
         nbOfObservations = 2*parametersSets[i]["maturity"]+1;
         varianceSwaps.push_back(VarianceSwap(parametersSets[i]["maturity"],
-                                             nbOfObservations));
+                                nbOfObservations));
         
     }
 
@@ -166,7 +166,7 @@ void testThreeParametersSets()
         std::vector<double> timePoints, temp;
         dates = varianceSwaps[i].getDates();
         for(std::size_t j = 0; j < dates.size()-1; j++)
-        {   
+        {
             temp = MathFunctions::buildLinearSpace(dates[j],dates[j+1],nbTimePoints);
             timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
             if(j == dates.size()-2)
@@ -204,7 +204,7 @@ void testDiscretizationTimestep()
 
     //Variance swap parameters
     double maturity = 1.0;
-    std::size_t nbOfObservations = maturity*2+1; 
+    std::size_t nbOfObservations = maturity*2+1;
 
     VarianceSwap varianceSwap(maturity,nbOfObservations);
 
@@ -225,11 +225,11 @@ void testDiscretizationTimestep()
 
     for(std::size_t i = 0; i < nbTimePoints.size(); i++)
     {
-        file << nbTimePoints[i] << ";"; 
+        file << nbTimePoints[i] << ";";
         file << analyticalPrice << ";";
-        std::vector<double> timePoints, temp;  
+        std::vector<double> timePoints, temp;
         for(std::size_t j = 0; j < dates.size()-1; j++)
-        {   
+        {
             temp = MathFunctions::buildLinearSpace(dates[j],dates[j+1],nbTimePoints[i]);
             timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
             if(j == dates.size()-2)
@@ -256,12 +256,55 @@ void testDiscretizationTimestep()
     file.close();
 }
 
+
+void test_QEMC(){
+    //Heston model parameters
+       double drift = 0, kappa = 0.5, theta = 0.04, eps = 0.5, rho = -0.9,
+               V0 = 0.04, X0 = 100;
+
+       HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+
+       //Variance swap parameters
+       double maturity = 10.0;
+       std::size_t nbOfObservations = maturity*2+1;
+
+       VarianceSwap varianceSwap(maturity,nbOfObservations);
+       std::vector<double> dates = varianceSwap.getDates();
+
+       //Simulation parameters
+       size_t nbSimulations = 100000, nbTimePoints = 100;
+       std::vector<double> timePoints, temp;
+       for(std::size_t i = 0; i < dates.size()-1; i++)
+       {
+           temp = MathFunctions::buildLinearSpace(dates[i],dates[i+1],nbTimePoints);
+           timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
+           if(i == dates.size()-2)
+               timePoints.push_back(temp.back());
+       }
+       std::cout << "Analytical computation of the price" << std::endl;
+       VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
+       std::cout << anPricer.price(varianceSwap) << std::endl << std::endl;
+
+    std::cout << "Computation of the price using QE MC + BroadieKaya" << std::endl;
+    QuadraticExponentialMartingaleCorrectionScheme quadraticExponentialMCScheme(timePoints,hestonModel, true);
+    BroadieKayaScheme broadieKayaSchemeQEMC(quadraticExponentialMCScheme);
+    VarianceSwapsHestonMonteCarloPricer mcPricerBKQEMC(broadieKayaSchemeQEMC,nbSimulations);
+    std::cout << mcPricerBKQEMC.price(varianceSwap) << std::endl;
+
+    std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
+    QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel, true);
+    BroadieKayaScheme broadieKayaSchemeQE(quadraticExponentialScheme);
+    VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(broadieKayaSchemeQE,nbSimulations);
+    std::cout << mcPricerBKQE.price(varianceSwap) << std::endl;
+}
+
 int main()
 {   
+    test_QEMC();
     // testThreeParametersSets();
     // testDiscretizationTimestep();
     // testNbOfObservations();
-    testNbOfSimulations();
-        //Heston model parameters
+    //testNbOfSimulations();
+    //Heston model parameters
     return 0;
 }

@@ -42,10 +42,10 @@ void HestonVariancePathSimulator::preComputations()
 std::vector<double> HestonVariancePathSimulator::path() const
 {
     std::vector<double> path {initialValue_};
-	for (std::size_t index = 0; index < timePoints_.size() - 1; ++index)
-		path.push_back(nextStep(index, path[index]));
+    for (std::size_t index = 0; index < timePoints_.size() - 1; ++index)
+        path.push_back(nextStep(index, path[index]));
 
-	return path;
+    return path;
 }
 
 HestonModel HestonVariancePathSimulator::getHestonModel() const
@@ -97,7 +97,7 @@ void TruncatedGaussianScheme::preComputationsTG()
         psi = psiGrid_[i];
         r = MathFunctions::newtonMethod(initialGuess_,
                                         [psi](double r){return h(r,psi);},
-                                        [psi](double r){return hPrime(r,psi);});
+        [psi](double r){return hPrime(r,psi);});
         phi = MathFunctions::normalPDF(r);
         Phi = MathFunctions::normalCDF(r);
         fmu_.push_back(r/(phi+r*Phi));
@@ -188,8 +188,70 @@ QuadraticExponentialScheme::QuadraticExponentialScheme(const QuadraticExponentia
     
 }
 
-
 QuadraticExponentialScheme* QuadraticExponentialScheme::clone() const
 {
     return new QuadraticExponentialScheme(*this);
+}
+
+// QE with Martingale correction
+QuadraticExponentialMartingaleCorrectionScheme::QuadraticExponentialMartingaleCorrectionScheme(const std::vector<double>& timePoints,
+                                                                                               const HestonModel& hestonModel, double psiC):
+    QuadraticExponentialScheme(timePoints,hestonModel,psiC)
+{
+
+}
+
+QuadraticExponentialMartingaleCorrectionScheme::QuadraticExponentialMartingaleCorrectionScheme(const QuadraticExponentialMartingaleCorrectionScheme&
+                                                                                               quadraticExponentialScheme):
+    QuadraticExponentialScheme(quadraticExponentialScheme.timePoints_,
+                                *quadraticExponentialScheme.hestonModel_, quadraticExponentialScheme.psiC_)
+{
+
+}
+
+double QuadraticExponentialMartingaleCorrectionScheme::nextStep(std::size_t currentIndex, double currentValue) const {
+    double m = k1_[currentIndex]*currentValue + k2_[currentIndex];
+    double s2 = k3_[currentIndex]*currentValue + k4_[currentIndex];
+    double psi = s2/(m*m);
+    double U = MathFunctions::simulateUniformRandomVariable();
+    if (psi<=psiC_){
+        double temp_value = 2./psi;
+        double b = sqrt(temp_value - 1. + sqrt(temp_value*(temp_value-1.)));
+        double a = m/(1+b*b);
+        double Zv = MathFunctions::normalCDFInverse(U);
+        mCCoeff1 = a;
+        mCCoeff2 = b;
+        mCCase = true;
+        return a*(b+Zv)*(b+Zv);
+    }
+    else {
+        double p = (psi-1.)/(psi+1.);
+        double beta = (1-p)/m;
+        mCCoeff1 = p;
+        mCCoeff2 = beta;
+        mCCase = false;
+        if (U<=p){
+            return 0.;
+        }
+        else{
+            return log((1-p)/(1-U))/beta;
+        }
+    }
+}
+
+QuadraticExponentialMartingaleCorrectionScheme* QuadraticExponentialMartingaleCorrectionScheme::clone() const
+{
+    return new QuadraticExponentialMartingaleCorrectionScheme(*this);
+}
+
+bool QuadraticExponentialMartingaleCorrectionScheme::getMCCase() const{
+    return mCCase;
+}
+
+double QuadraticExponentialMartingaleCorrectionScheme::getMCCoeff1() const{
+    return mCCoeff1;
+}
+
+double QuadraticExponentialMartingaleCorrectionScheme::getMCCoeff2() const{
+    return mCCoeff2;
 }
