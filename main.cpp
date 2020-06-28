@@ -9,6 +9,71 @@
 #include "VarianceSwapsHestonMonteCarloPricer.h"
 #include "VarianceSwapsHestonAnalyticalPricer.h"
 
+void testKappaParameter(){
+    //Heston model parameters
+    double drift = 0, theta = 0.04, eps = 1, rho = -0.9,
+            V0 = 0.04, X0 = 100;
+    double kappaInit = 0.2;
+
+    //Variance swap parameters
+    double maturity = 1.0;
+    double nbOfObservations = 2*maturity+1;
+
+    VarianceSwap varianceSwap(maturity,nbOfObservations);
+
+    std::ofstream file;
+    file.open ("C:/Users/Arnaud/Documents/GitHub/Variance-Swaps-Pricer/Tests/test_kappa_influence.csv");
+    file << "Kappa;Prix Analytique \n";
+
+    for (size_t i=0 ; i<15 ; i=i+1){
+        double kappa = kappaInit + i * 0.05;
+        HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+
+        std::cout << "Analytical computation of the price for kappa = " << kappa << std::endl;
+        VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
+        double analyticalPrice = anPricer.price(varianceSwap);
+        std::cout << analyticalPrice << std::endl << std::endl;
+
+        file << kappa << ";";
+        file << analyticalPrice << "\n";
+
+    }
+    file.close();
+}
+
+void testMaturityParameter(){
+    //Heston model parameters
+    double drift = 0, theta = 0.04, eps = 1, rho = -0.9,
+            V0 = 0.04, X0 = 100, kappa = 0.5 ;
+
+    HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+
+    //Variance swap parameters
+    double maturityInit = 0.5;
+
+
+    std::ofstream file;
+    file.open ("C:/Users/Arnaud/Documents/GitHub/Variance-Swaps-Pricer/Tests/test_maturity_influence.csv");
+    file << "Kappa;Prix Analytique \n";
+
+    for (size_t i=0 ; i<20 ; i=i+1){
+        double maturity = maturityInit + i * 0.5;
+        double nbOfObservations = 2*maturity+1;
+
+        VarianceSwap varianceSwap(maturity,nbOfObservations);
+
+        std::cout << "Analytical computation of the price for maturity = " << maturity << std::endl;
+        VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
+        double analyticalPrice = anPricer.price(varianceSwap);
+        std::cout << analyticalPrice << std::endl << std::endl;
+
+        file << maturity << ";";
+        file << analyticalPrice << "\n";
+
+    }
+    file.close();
+}
+
 void testNbOfObservations()
 {
     //Heston model parameters
@@ -20,7 +85,7 @@ void testNbOfObservations()
     //Variance swap parameters
     double maturity = 10.0;
     double nbOfObservations;
-    double nbOfObservationsMax= 1000;
+    double nbOfObservationsMax= 60;
 
     std::ofstream file;
     file.open ("../Tests/test_convergence_nb_of_observations_analytical.csv");
@@ -312,8 +377,10 @@ int main()
     //test_QEMC();
     //testThreeParametersSets();
     //testDiscretizationTimestep();
-    testNbOfObservations();
+    //testNbOfObservations();
     //testNbOfSimulations();
     //Heston model parameters
+    //testKappaParameter();
+    testMaturityParameter();
     return 0;
 }
