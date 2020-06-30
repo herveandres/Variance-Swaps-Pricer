@@ -7,7 +7,6 @@ HestonModel::HestonModel(double drift,
                         double correlation,
                         double initialVolatility,
                         double initialAssetValue):
-                        Model(),
                         drift_(drift),
                         meanReversionSpeed_(meanReversionSpeed),
                         meanReversionLevel_(meanReversionLevel),

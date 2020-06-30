@@ -14,8 +14,28 @@ VarianceSwapsHestonAnalyticalPricer::~VarianceSwapsHestonAnalyticalPricer()
     delete hestonModel_;
 }
 
+VarianceSwapsHestonAnalyticalPricer::VarianceSwapsHestonAnalyticalPricer(
+                const VarianceSwapsHestonAnalyticalPricer& analyticalPricer):
+        hestonModel_(new HestonModel(*(analyticalPricer.hestonModel_)))
+{
+
+}
+
+VarianceSwapsHestonAnalyticalPricer& VarianceSwapsHestonAnalyticalPricer::operator=(
+                        const VarianceSwapsHestonAnalyticalPricer& analyticalPricer)
+{
+    if (this == &analyticalPricer)
+		return *this;
+	else
+	{
+		delete hestonModel_;												
+		hestonModel_ = new HestonModel(*(analyticalPricer.hestonModel_));
+	}
+	return *this;
+}
+
 std::complex<double>j(0.,1.);
-//useful variables to compute function C and D
+
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 aTerm(double omega) const {
     return hestonModel_->getMeanReversionSpeed() - hestonModel_->getCorrelation() * hestonModel_->getVolOfVol() * omega * j  ;
@@ -32,13 +52,10 @@ std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 gTerm(double omega) const {
     std::complex<double> a = aTerm(omega),
                     b = bTerm(omega);
-    // std::cout << a << " " << b << std::endl;
-    // std::cout << a-b << std::endl;
-    return (a-b)/(a+b); //defintion during class
+    return (a-b)/(a+b); //defintion during class -> more stable
     // return (a+b)/(a-b); //definition in PDF
 }
 
-//functions C and D and their derivatives
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 functionC(double tau, double omega) const {
     double r = hestonModel_->getDrift(),
@@ -48,7 +65,6 @@ functionC(double tau, double omega) const {
     std::complex<double> a = aTerm(omega),
                         b = bTerm(omega),
                         g = gTerm(omega);
-    // std::cout << a << " " << b << " " << g << std::endl;
     return tau * r * (j * omega - 1.)+ kappa * theta / (sigma*sigma) * ((a-b)*tau-2.*std::log((1.-g*std::exp(-b*tau))/(1.-g))) ; // definition in class
     // return tau * r * (j * omega - 1.)+ kappa * theta / (sigma*sigma) * ((a+b)*tau-2.*std::log((1.-g*std::exp(b*tau))/(1.-g))) ; // definition in PDF
 }
@@ -60,8 +76,6 @@ functionD(double tau, double omega) const {
                          b = bTerm(omega),
                          g = gTerm(omega);
     std::complex<double> D_init = (a-b)/(sigma*sigma); //definition during class
-    // std::complex<double> D_init = (a+b)/(sigma*sigma); //definition in PDF
-    //D_init=(aTerm(omega)-bTerm(omega))/(hestonModel_->getVolOfVol()*hestonModel_->getVolOfVol()); // definition in class
     return D_init*(1.-std::exp(-b*tau))/(1.-g*std::exp(-b*tau)); // in class
     // return D_init*(1.-std::exp(b*tau))/(1.-g*std::exp(b*tau)); // in PDF
 }
@@ -98,7 +112,6 @@ functionDSecond(double tau, double omega) const {
     return MathFunctions::finiteDifference(f,omega,tau);
 }
 
-//useful terms in respect of the Chi2 law
 double VarianceSwapsHestonAnalyticalPricer::
 qtildeTerm() const {
     double kappa = hestonModel_->getMeanReversionSpeed(), 
@@ -119,7 +132,6 @@ wTerm(double t) const {
     return cTerm(t)*std::exp(-hestonModel_->getMeanReversionSpeed()*t)*hestonModel_->getInitialVolatility();
 }
 
-//log²(Sti/Sti-1)
 double VarianceSwapsHestonAnalyticalPricer::
 u1Term(double t1, double t2) const {
     double delta = t2-t1,

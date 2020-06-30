@@ -58,6 +58,7 @@ namespace MathFunctions
         return result;
     }
 
+    //We set the value of the seed to a given value
     unsigned seed = 10;
     std::default_random_engine generator(seed);
 
@@ -89,7 +90,6 @@ namespace MathFunctions
         return (f(tau,omega+epsilon)-f(tau,omega-epsilon))/(2*epsilon);
     }
 
-    //Function looking for the index i s.t. list[i] <= x < list[i+1] (list is sorted)
     std::size_t binarySearch(const std::vector<double>& list, double x)
     {
         if(list.back() <= x)

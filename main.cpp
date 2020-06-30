@@ -9,6 +9,9 @@
 #include "VarianceSwapsHestonMonteCarloPricer.h"
 #include "VarianceSwapsHestonAnalyticalPricer.h"
 
+//Root path where all the results will be written
+std::string rootPath = "../Tests/";
+
 void testKappaParameter(){
     //Heston model parameters
     double drift = 0, theta = 0.04, eps = 1, rho = -0.9,
@@ -17,14 +20,17 @@ void testKappaParameter(){
 
     //Variance swap parameters
     double maturity = 1.0;
-    double nbOfObservations = 2*maturity+1;
+    size_t nbOfObservationsPerYear = 2;
+    double nbOfObservations = nbOfObservationsPerYear*maturity+1;
 
     VarianceSwap varianceSwap(maturity,nbOfObservations);
 
+    //We write our results in a csv file.
     std::ofstream file;
-    file.open ("C:/Users/Arnaud/Documents/GitHub/Variance-Swaps-Pricer/Tests/test_kappa_influence.csv");
+    file.open (rootPath+"test_kappa_influence.csv");
     file << "Kappa;Prix Analytique \n";
 
+    //We loop over several values of kappa
     for (size_t i=0 ; i<15 ; i=i+1){
         double kappa = kappaInit + i * 0.05;
         HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
@@ -50,15 +56,17 @@ void testMaturityParameter(){
 
     //Variance swap parameters
     double maturityInit = 0.5;
+    size_t nbOfObservationsPerYear = 2;
 
-
+    //We write our results in a csv file.
     std::ofstream file;
-    file.open ("C:/Users/Arnaud/Documents/GitHub/Variance-Swaps-Pricer/Tests/test_maturity_influence.csv");
+    file.open (rootPath+"test_maturity_influence.csv");
     file << "Kappa;Prix Analytique \n";
 
+    //We loop over several maturities
     for (size_t i=0 ; i<20 ; i=i+1){
         double maturity = maturityInit + i * 0.5;
-        double nbOfObservations = 2*maturity+1;
+        double nbOfObservations = nbOfObservationsPerYear*maturity+1;
 
         VarianceSwap varianceSwap(maturity,nbOfObservations);
 
@@ -87,10 +95,12 @@ void testNbOfObservations()
     double nbOfObservations;
     double nbOfObservationsMax= 60;
 
+    //We write our results in a csv file.
     std::ofstream file;
-    file.open ("../Tests/test_convergence_nb_of_observations_analytical.csv");
+    file.open(rootPath+"test_convergence_nb_of_observations_analytical.csv");
     file << "Nombre d'observations;Prix Analytique;Prix Analytique Continu; Différence \n";
 
+    //We loop over several numbers of observations
     for (size_t i=2 ; i<nbOfObservationsMax+1 ; i=i+20)
     {
         nbOfObservations= i*maturity+1;
@@ -128,7 +138,8 @@ void testNbOfSimulations()
 
     //Variance swap parameters
     double maturity = 1.0;
-    double nbOfObservations = 2*maturity+1;
+    size_t nbOfObservationsPerYear = 2;
+    double nbOfObservations = nbOfObservationsPerYear*maturity+1;
 
     VarianceSwap varianceSwap(maturity,nbOfObservations);
 
@@ -143,6 +154,7 @@ void testNbOfSimulations()
     size_t nbTimePoints = 1000;
     std::vector<double> dates = varianceSwap.getDates();
 
+    //We create a time grid that includes the dates of observations of the variance swap
     std::vector<double> timePoints, temp;
     for(std::size_t j = 0; j < dates.size()-1; j++)
     {
@@ -158,10 +170,12 @@ void testNbOfSimulations()
     QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel);
     BroadieKayaScheme broadieKayaSchemeQE(quadraticExponentialScheme);
 
+    //We write our results in a csv file.
     std::ofstream file;
-    file.open ("../Tests/test_convergence_nb_of_simulations.csv");
+    file.open (rootPath+"test_convergence_nb_of_simulations.csv");
     file << "Nombre de simulations;Prix analytique;Prix BKTG;Prix BKQE \n";
 
+    //We loop over several numbers of simulation
     for (size_t nbSimulations = nbSimulationsMin; nbSimulations<nbSimulationsMax+1 ; nbSimulations=nbSimulations+pasSimulations ){
 
         std::cout << "---------- Nombre de simulations : " << nbSimulations << " ----------" << std::endl << std::endl;
@@ -187,6 +201,7 @@ void testNbOfSimulations()
 
 }
 
+//Computes variance swaps prices in the three Heston model parametrizations given by Andersen
 void testThreeParametersSets()
 {
     std::vector<std::map<std::string,double> > parametersSets;
@@ -278,13 +293,14 @@ void testDiscretizationTimestep()
 
     //Variance swap parameters
     double maturity = 1.0;
-    std::size_t nbOfObservations = maturity*2+1;
+    size_t nbOfObservationsPerYear = 2;
+    size_t nbOfObservations = maturity*nbOfObservationsPerYear+1;
 
     VarianceSwap varianceSwap(maturity,nbOfObservations);
 
-
+    /*We write our results in a csv file*/
     std::ofstream file;
-    file.open ("../Tests/test_convergence_timestep_temp.csv");
+    file.open (rootPath+"test_convergence_timestep.csv");
     //Pricing analytique
     std::cout << "Analytical computation of the price" << std::endl;
     VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
@@ -296,7 +312,8 @@ void testDiscretizationTimestep()
     std::vector<double> dates = varianceSwap.getDates();
     size_t nbSimulations = 10000;
     std::vector<double> nbTimePoints{100,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000};
-
+    
+    //We loop over the number of points between two observation dates
     for(std::size_t i = 0; i < nbTimePoints.size(); i++)
     {
         file << nbTimePoints[i] << ";";
@@ -375,12 +392,11 @@ void test_QEMC(){
 int main()
 {   
     //test_QEMC();
-    //testThreeParametersSets();
-    //testDiscretizationTimestep();
+    // testThreeParametersSets();
+    testDiscretizationTimestep();
     //testNbOfObservations();
     //testNbOfSimulations();
-    //Heston model parameters
     //testKappaParameter();
-    testMaturityParameter();
+    // testMaturityParameter();
     return 0;
 }

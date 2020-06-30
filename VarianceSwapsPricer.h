@@ -4,6 +4,7 @@
 #include "VarianceSwap.h"
 #include "Model.h"
 
+//Abstract class
 class VarianceSwapsPricer
 {
 protected:
@@ -13,6 +14,7 @@ public:
     virtual double price(const VarianceSwap& varianceSwap) const = 0;
 };
 
+//Abstract class
 class VarianceSwapsHestonPricer : public VarianceSwapsPricer
 {
 public:

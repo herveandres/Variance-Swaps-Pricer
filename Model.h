@@ -1,16 +1,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-class Model
-{
-private:
-    /* data */
-public:
 
-};
-
-
-class HestonModel : public Model
+class HestonModel
 {
 private:
     double drift_;

@@ -14,10 +14,35 @@ HestonVariancePathSimulator::HestonVariancePathSimulator(
     preComputations();
 }
 
+HestonVariancePathSimulator::HestonVariancePathSimulator
+                        (const HestonVariancePathSimulator& variancePathSimulator):
+    PathSimulator(variancePathSimulator.initialValue_,variancePathSimulator.timePoints_),
+    hestonModel_(new HestonModel(*(variancePathSimulator.hestonModel_)))
+{
+
+}
+
 HestonVariancePathSimulator::~HestonVariancePathSimulator()
 {
     delete hestonModel_;
 }
+
+HestonVariancePathSimulator& HestonVariancePathSimulator::operator=(
+                        const HestonVariancePathSimulator& variancePathSimulator)
+{
+    if (this == &variancePathSimulator)
+		return *this;
+	else
+	{
+		delete hestonModel_;												
+		hestonModel_ = new HestonModel(*(variancePathSimulator.hestonModel_));
+
+        initialValue_ = variancePathSimulator.initialValue_;
+        timePoints_ = variancePathSimulator.timePoints_;
+	}
+	return *this;
+}
+
 
 void HestonVariancePathSimulator::preComputations()
 {
@@ -28,6 +53,7 @@ void HestonVariancePathSimulator::preComputations()
     double expMinusKappaDelta;
 
     //Pre-computation of k1, k2, k3, k4 s.t. m = k1 V + k2 and s² = k3 V + k4
+    // NB : we allow the time grid to be non-equidistant so that the computed quantities are time dependent.
     for(std::size_t i = 0; i < timePoints_.size()-1; i++)
     {
         delta = timePoints_[i+1] - timePoints_[i];
@@ -88,6 +114,7 @@ void TruncatedGaussianScheme::preComputationsTG()
     double kappa = hestonModel_->getMeanReversionSpeed();
     double eps = hestonModel_->getVolOfVol();
 
+    //We first construct a grid for psi 
     double min = 1.0/(confidenceMultiplier_*confidenceMultiplier_);
     double max = eps*eps/(2*kappa*theta);
     psiGrid_ = MathFunctions::buildLinearSpace(min,max,psiGrid_.size());
@@ -95,9 +122,10 @@ void TruncatedGaussianScheme::preComputationsTG()
     for(std::size_t i = 0; i < psiGrid_.size(); i++)
     {
         psi = psiGrid_[i];
+        //We look for r that nullifies the function h by using a Newton method
         r = MathFunctions::newtonMethod(initialGuess_,
                                         [psi](double r){return h(r,psi);},
-        [psi](double r){return hPrime(r,psi);});
+                                        [psi](double r){return hPrime(r,psi);});
         phi = MathFunctions::normalPDF(r);
         Phi = MathFunctions::normalCDF(r);
         fmu_.push_back(r/(phi+r*Phi));
@@ -107,18 +135,21 @@ void TruncatedGaussianScheme::preComputationsTG()
 
 double TruncatedGaussianScheme::nextStep(std::size_t currentIndex, double currentValue) const
 {
+    //We used the pre-computed coefficients to compute m and s²
     double m = k1_[currentIndex]*currentValue + k2_[currentIndex];
     double s2 = k3_[currentIndex]*currentValue + k4_[currentIndex];
     double psi = s2/(m*m);
     double mu, sigma;
 
+    //If psi is close to 0, we skip the moment-fitting step
     if(psi < 1.0/(confidenceMultiplier_*confidenceMultiplier_))
     {
         mu = m;
         sigma = sqrt(s2);
     }
-    else
-    {
+    else 
+    {   
+        //We look for i such that psiGrid_[i] <= psi < psiGrid_[i+1]
         std::size_t idxPhi = MathFunctions::binarySearch(psiGrid_,psi);
         double psi0 = psiGrid_[idxPhi], psi1 = psiGrid_[idxPhi+1];
         //Linear interpolation of fmu and fsigma using the pre-computed values
@@ -155,15 +186,35 @@ QuadraticExponentialScheme::QuadraticExponentialScheme(const std::vector<double>
 
 }
 
+QuadraticExponentialScheme::QuadraticExponentialScheme(const QuadraticExponentialScheme&
+                                                       quadraticExponentialScheme):
+    HestonVariancePathSimulator(quadraticExponentialScheme.timePoints_,
+                                *quadraticExponentialScheme.hestonModel_),
+    psiC_(quadraticExponentialScheme.psiC_)
+{
+    
+}
+
+QuadraticExponentialScheme* QuadraticExponentialScheme::clone() const
+{
+    return new QuadraticExponentialScheme(*this);
+}
+
 double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double currentValue) const{
+    
+    //We used the pre-computed coefficients to compute m and s²
     double m = k1_[currentIndex]*currentValue + k2_[currentIndex];
     double s2 = k3_[currentIndex]*currentValue + k4_[currentIndex];
     double psi = s2/(m*m);
     double U = MathFunctions::simulateUniformRandomVariable();
+
     if (psi<psiC_){
         double temp_value = 2./psi;
         double b = std::sqrt(temp_value - 1. + std::sqrt(temp_value*(temp_value-1.)));
         double a = m/(1+b*b);
+
+        /*Since we already computed a uniform random variable, we use here
+        Moho's inverse of the normal cdf instead of Box-Müller method as for TG */
         double Zv = MathFunctions::normalCDFInverse(U);
         return a*(b+Zv)*(b+Zv);
     }
@@ -177,20 +228,6 @@ double QuadraticExponentialScheme::nextStep(std::size_t currentIndex, double cur
             return std::log((1-p)/(1-U))/beta;
         }
     }
-}
-
-QuadraticExponentialScheme::QuadraticExponentialScheme(const QuadraticExponentialScheme&
-                                                       quadraticExponentialScheme):
-    HestonVariancePathSimulator(quadraticExponentialScheme.timePoints_,
-                                *quadraticExponentialScheme.hestonModel_),
-    psiC_(quadraticExponentialScheme.psiC_)
-{
-    
-}
-
-QuadraticExponentialScheme* QuadraticExponentialScheme::clone() const
-{
-    return new QuadraticExponentialScheme(*this);
 }
 
 // QE with Martingale correction

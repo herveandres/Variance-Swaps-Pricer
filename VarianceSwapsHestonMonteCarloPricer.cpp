@@ -15,13 +15,34 @@ VarianceSwapsHestonMonteCarloPricer::~VarianceSwapsHestonMonteCarloPricer()
     delete hestonPathSimulator_;
 }
 
+VarianceSwapsHestonMonteCarloPricer::VarianceSwapsHestonMonteCarloPricer(
+                    const VarianceSwapsHestonMonteCarloPricer& mcPricer):
+        hestonPathSimulator_(mcPricer.hestonPathSimulator_->clone()),
+        nbSimulations_(mcPricer.nbSimulations_)
+{
+
+}
+    
+VarianceSwapsHestonMonteCarloPricer& VarianceSwapsHestonMonteCarloPricer::operator=(
+                    const VarianceSwapsHestonMonteCarloPricer& mcPricer)
+{
+    if (this == &mcPricer)
+		return *this;
+	else
+	{
+		delete hestonPathSimulator_;												
+		hestonPathSimulator_ = mcPricer.hestonPathSimulator_->clone();
+	}
+	return *this;
+}
+
 double VarianceSwapsHestonMonteCarloPricer::pathPrice(std::vector<double> path,
                                                 double maturity) const
 {
     double pathPrice = 0.0; 
     for(size_t i = 0; i < path.size()-1; i++)
     {   
-        pathPrice += std::pow(path[i+1]-path[i],2); 
+        pathPrice += std::pow(path[i+1]-path[i],2); //Reminder : path[i] = log(S_ti) 
     }
     return 100*100*pathPrice/maturity;
 }

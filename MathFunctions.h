@@ -11,17 +11,20 @@
 
 
 namespace MathFunctions
-{
+{   
     double normalPDF(double x);
 
     double normalCDF(double x);
 
+    //Inverse of the normal cdf (Moho's formula)
     double normalCDFInverse(double x);
 
+    //Those are used to set the seed of the random number generator
     extern unsigned seed;
     extern std::default_random_engine generator;
 
     double simulateUniformRandomVariable();
+    
     //Simulate a standard Gaussian variable using Box-Muller method
     double simulateGaussianRandomVariable();
 
