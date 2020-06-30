@@ -94,7 +94,7 @@ namespace MathFunctions
     {
         if(list.back() <= x)
         {
-            return list.size()-1;
+            return list.size()-2;
         }
         else if (list.front() > x)
         {

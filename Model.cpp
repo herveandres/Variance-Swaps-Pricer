@@ -1,12 +1,14 @@
 #include "Model.h"
 
-HestonModel::HestonModel(double drift,
+HestonModel::HestonModel(double riskFreeRate,
+                        double drift,
                         double meanReversionSpeed,
                         double meanReversionLevel,
                         double volOfVol,
                         double correlation,
                         double initialVolatility,
                         double initialAssetValue):
+                        riskFreeRate_(riskFreeRate),
                         drift_(drift),
                         meanReversionSpeed_(meanReversionSpeed),
                         meanReversionLevel_(meanReversionLevel),
@@ -19,13 +21,19 @@ HestonModel::HestonModel(double drift,
 }
 
 HestonModel::HestonModel(const HestonModel& hestonModel):
-    drift_(hestonModel.drift_), meanReversionSpeed_(hestonModel.meanReversionSpeed_),
+    riskFreeRate_(hestonModel.riskFreeRate_), drift_(hestonModel.drift_),
+    meanReversionSpeed_(hestonModel.meanReversionSpeed_),
     meanReversionLevel_(hestonModel.meanReversionLevel_), 
     volOfVol_(hestonModel.volOfVol_), correlation_(hestonModel.correlation_),
     initialVolatility_(hestonModel.initialVolatility_), 
     initialAssetValue_(hestonModel.initialAssetValue_)
 {
 
+}
+
+double HestonModel::getRiskFreeRate() const
+{
+    return riskFreeRate_;
 }
 
 double HestonModel::getDrift() const

@@ -58,14 +58,15 @@ gTerm(double omega) const {
 
 std::complex<double> VarianceSwapsHestonAnalyticalPricer::
 functionC(double tau, double omega) const {
-    double r = hestonModel_->getDrift(),
+    double r = hestonModel_->getRiskFreeRate(),
+           mu = hestonModel_->getDrift(),
            kappa = hestonModel_->getMeanReversionSpeed(),
            theta = hestonModel_->getMeanReversionLevel(),
            sigma = hestonModel_->getVolOfVol();
     std::complex<double> a = aTerm(omega),
                         b = bTerm(omega),
                         g = gTerm(omega);
-    return tau * r * (j * omega - 1.)+ kappa * theta / (sigma*sigma) * ((a-b)*tau-2.*std::log((1.-g*std::exp(-b*tau))/(1.-g))) ; // definition in class
+    return tau*(j * omega*mu - r)+ kappa * theta / (sigma*sigma) * ((a-b)*tau-2.*std::log((1.-g*std::exp(-b*tau))/(1.-g))) ; // definition in class
     // return tau * r * (j * omega - 1.)+ kappa * theta / (sigma*sigma) * ((a+b)*tau-2.*std::log((1.-g*std::exp(b*tau))/(1.-g))) ; // definition in PDF
 }
 

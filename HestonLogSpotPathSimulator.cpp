@@ -100,7 +100,6 @@ BroadieKayaScheme* BroadieKayaScheme::clone() const{
 double BroadieKayaScheme::nextStep(std::size_t currentIndex, double currentValue, const std::vector<double>& variancePath) const
 {   
     double Z = MathFunctions::simulateGaussianRandomVariable();
-    //Ajouter drift
     return currentValue
             +variancePathSimulator_->getHestonModel().getDrift()*(timePoints_[currentIndex+1] - timePoints_[currentIndex])
             +k0_[currentIndex]+k1_[currentIndex]*variancePath[currentIndex]

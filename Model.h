@@ -5,6 +5,7 @@
 class HestonModel
 {
 private:
+    double riskFreeRate_;
     double drift_;
     double meanReversionSpeed_;
     double meanReversionLevel_;
@@ -13,7 +14,8 @@ private:
     double initialVolatility_;
     double initialAssetValue_;
 public:
-    HestonModel(double drift,
+    HestonModel(double riskFreeRate,
+                double drift,
                 double meanReversionSpeed,
                 double meanReversionLevel,
                 double volOfVol,
@@ -21,6 +23,7 @@ public:
                 double initialVolatility,
                 double initialAssetValue);
     HestonModel(const HestonModel& hestonModel);
+    double getRiskFreeRate() const;
     double getDrift() const;
     double getMeanReversionSpeed() const;
     double getMeanReversionLevel() const;

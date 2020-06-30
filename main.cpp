@@ -14,7 +14,7 @@ std::string rootPath = "../Tests/";
 
 void testKappaParameter(){
     //Heston model parameters
-    double drift = 0, theta = 0.04, eps = 1, rho = -0.9,
+    double r = 0, drift = 0, theta = 0.04, eps = 1, rho = -0.9,
             V0 = 0.04, X0 = 100;
     double kappaInit = 0.2;
 
@@ -33,7 +33,7 @@ void testKappaParameter(){
     //We loop over several values of kappa
     for (size_t i=0 ; i<15 ; i=i+1){
         double kappa = kappaInit + i * 0.05;
-        HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+        HestonModel hestonModel(r,drift,kappa,theta,eps,rho,V0,X0);
 
         std::cout << "Analytical computation of the price for kappa = " << kappa << std::endl;
         VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
@@ -49,10 +49,10 @@ void testKappaParameter(){
 
 void testMaturityParameter(){
     //Heston model parameters
-    double drift = 0, theta = 0.04, eps = 1, rho = -0.9,
+    double r = 0, drift = 0, theta = 0.04, eps = 1, rho = -0.9,
             V0 = 0.04, X0 = 100, kappa = 0.5 ;
 
-    HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+    HestonModel hestonModel(r,drift,kappa,theta,eps,rho,V0,X0);
 
     //Variance swap parameters
     double maturityInit = 0.5;
@@ -85,10 +85,10 @@ void testMaturityParameter(){
 void testNbOfObservations()
 {
     //Heston model parameters
-    double drift = 0, kappa = 0.5, theta = 0.04, eps = 1, rho = -0.9,
+    double r = 0, drift = 0, kappa = 0.5, theta = 0.04, eps = 1, rho = -0.9,
             V0 = 0.04, X0 = 100;
 
-    HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+    HestonModel hestonModel(r,drift,kappa,theta,eps,rho,V0,X0);
 
     //Variance swap parameters
     double maturity = 10.0;
@@ -131,10 +131,10 @@ void testNbOfObservations()
 void testNbOfSimulations()
 {
     //Heston model parameters
-    double drift = 0, kappa = 0.5, theta = 0.04, eps = 1, rho = -0.9,
+    double r = 0, drift = 0, kappa = 0.5, theta = 0.04, eps = 1, rho = -0.9,
             V0 = 0.04, X0 = 100;
 
-    HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+    HestonModel hestonModel(r,drift,kappa,theta,eps,rho,V0,X0);
 
     //Variance swap parameters
     double maturity = 1.0;
@@ -209,19 +209,19 @@ void testThreeParametersSets()
     //Heston model parameters and variance
     //Case I
     std::map<std::string,double> parameters;
-    parameters["drift"] = 0; parameters["kappa"] = 0.5; parameters["theta"] = 0.04;
+    parameters["r"] = 0; parameters["drift"] = 0; parameters["kappa"] = 0.5; parameters["theta"] = 0.04;
     parameters["eps"] = 1; parameters["rho"] = -0.9; parameters["V0"] = 0.04;
     parameters["X0"] = 100; parameters["maturity"] = 10.0;
     parametersSets.push_back(parameters);
 
     //Case II
-    parameters["drift"] = 0; parameters["kappa"] = 0.3; parameters["theta"] = 0.04;
+    parameters["r"] = 0; parameters["drift"] = 0; parameters["kappa"] = 0.3; parameters["theta"] = 0.04;
     parameters["eps"] = 0.9; parameters["rho"] = -0.5; parameters["V0"] = 0.04;
     parameters["X0"] = 100; parameters["maturity"] = 15.0;
     parametersSets.push_back(parameters);
 
     //Case III
-    parameters["drift"] = 0; parameters["kappa"] = 1; parameters["theta"] = 0.09;
+    parameters["r"] = 0; parameters["drift"] = 0; parameters["kappa"] = 1; parameters["theta"] = 0.09;
     parameters["eps"] = 1; parameters["rho"] = -0.3; parameters["V0"] = 0.09;
     parameters["X0"] = 100; parameters["maturity"] = 5.0;
     parametersSets.push_back(parameters);
@@ -234,13 +234,14 @@ void testThreeParametersSets()
     size_t nbOfObservations;
     for(size_t i = 0; i < parametersSets.size(); i++)
     {
-        hestonModels.push_back(HestonModel(parametersSets[i]["drift"],
-                               parametersSets[i]["kappa"],
-                parametersSets[i]["theta"],
-                parametersSets[i]["eps"],
-                parametersSets[i]["rho"],
-                parametersSets[i]["V0"],
-                parametersSets[i]["X0"]));
+        hestonModels.push_back(HestonModel(parametersSets[i]["r"],
+                                        parametersSets[i]["drift"],
+                                        parametersSets[i]["kappa"],
+                                        parametersSets[i]["theta"],
+                                        parametersSets[i]["eps"],
+                                        parametersSets[i]["rho"],
+                                        parametersSets[i]["V0"],
+                                        parametersSets[i]["X0"]));
         nbOfObservations = 2*parametersSets[i]["maturity"]+1;
         varianceSwaps.push_back(VarianceSwap(parametersSets[i]["maturity"],
                                 nbOfObservations));
@@ -286,10 +287,10 @@ void testThreeParametersSets()
 void testDiscretizationTimestep()
 {
     //Heston model parameters
-    double drift = 0, kappa = 0.5, theta = 0.04, eps = 1, rho = -0.9,
+    double r = 0, drift = 0, kappa = 0.5, theta = 0.04, eps = 1, rho = -0.9,
             V0 = 0.04, X0 = 100;
 
-    HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
+    HestonModel hestonModel(r,drift,kappa,theta,eps,rho,V0,X0);
 
     //Variance swap parameters
     double maturity = 1.0;
@@ -348,52 +349,10 @@ void testDiscretizationTimestep()
 }
 
 
-void test_QEMC(){
-    //Heston model parameters
-       double drift = 0, kappa = 0.5, theta = 0.04, eps = 0.5, rho = -0.9,
-               V0 = 0.04, X0 = 100;
-
-       HestonModel hestonModel(drift,kappa,theta,eps,rho,V0,X0);
-
-       //Variance swap parameters
-       double maturity = 10.0;
-       std::size_t nbOfObservations = maturity*2+1;
-
-       VarianceSwap varianceSwap(maturity,nbOfObservations);
-       std::vector<double> dates = varianceSwap.getDates();
-
-       //Simulation parameters
-       size_t nbSimulations = 100000, nbTimePoints = 100;
-       std::vector<double> timePoints, temp;
-       for(std::size_t i = 0; i < dates.size()-1; i++)
-       {
-           temp = MathFunctions::buildLinearSpace(dates[i],dates[i+1],nbTimePoints);
-           timePoints.insert(timePoints.end(), temp.begin(), temp.end()-1);
-           if(i == dates.size()-2)
-               timePoints.push_back(temp.back());
-       }
-       std::cout << "Analytical computation of the price" << std::endl;
-       VarianceSwapsHestonAnalyticalPricer anPricer(hestonModel);
-       std::cout << anPricer.price(varianceSwap) << std::endl << std::endl;
-
-    std::cout << "Computation of the price using QE MC + BroadieKaya" << std::endl;
-    QuadraticExponentialMartingaleCorrectionScheme quadraticExponentialMCScheme(timePoints,hestonModel, true);
-    BroadieKayaScheme broadieKayaSchemeQEMC(quadraticExponentialMCScheme);
-    VarianceSwapsHestonMonteCarloPricer mcPricerBKQEMC(broadieKayaSchemeQEMC,nbSimulations);
-    std::cout << mcPricerBKQEMC.price(varianceSwap) << std::endl;
-
-    std::cout << "Computation of the price using QE + BroadieKaya" << std::endl;
-    QuadraticExponentialScheme quadraticExponentialScheme(timePoints,hestonModel, true);
-    BroadieKayaScheme broadieKayaSchemeQE(quadraticExponentialScheme);
-    VarianceSwapsHestonMonteCarloPricer mcPricerBKQE(broadieKayaSchemeQE,nbSimulations);
-    std::cout << mcPricerBKQE.price(varianceSwap) << std::endl;
-}
-
 int main()
 {   
-    //test_QEMC();
-    // testThreeParametersSets();
-    testDiscretizationTimestep();
+    testThreeParametersSets();
+    // testDiscretizationTimestep();
     //testNbOfObservations();
     //testNbOfSimulations();
     //testKappaParameter();
