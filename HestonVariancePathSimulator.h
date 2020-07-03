@@ -92,24 +92,4 @@ public:
     QuadraticExponentialScheme* clone() const;
 };
 
-class QuadraticExponentialMartingaleCorrectionScheme: public QuadraticExponentialScheme
-{
-private:
-    mutable bool mCCase; // true = (psi <= psiC) and false = (psi> psiC)
-    mutable double mCCoeff1; // will be used as a or p, depending on condition on A in LogSpotPathSimulator process
-    mutable double mCCoeff2; // will be used as b or beta, depending on condition on A in LogSpotPathSimulator process
-    double nextStep(std::size_t currentIndex, double currentValue) const;
-public:
-    QuadraticExponentialMartingaleCorrectionScheme(const std::vector<double>& timePoints,
-                                const HestonModel& hestonModel, double psiC = 1.5);
-    //Copy constructor
-    QuadraticExponentialMartingaleCorrectionScheme(const QuadraticExponentialMartingaleCorrectionScheme& quadraticExponentialScheme);
-    QuadraticExponentialMartingaleCorrectionScheme* clone() const;
-
-    ~QuadraticExponentialMartingaleCorrectionScheme() = default;
-    bool getMCCase() const;
-    double getMCCoeff1() const;
-    double getMCCoeff2() const;
-};
-
 #endif 
